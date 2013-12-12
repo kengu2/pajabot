@@ -51,7 +51,7 @@ class PajaBot(SingleServerIRCBot):
                 if cmd=='!ovi':
                         self.sayDoorStatus()
                 if cmd=='!shot':
-                        os.system('/home/pi/takeshot.sh')
+                        os.system('/home/pi/pajabot/scripts/takeshot.sh')
                         c.privmsg(self.channel, 'Pajalla tapahtuu: http://5w.fi/shot.jpg')
 
         def _dispatcher(self, c, e):
