@@ -7,9 +7,10 @@ Dependencies:
 Python irclib, https://bitbucket.org/jaraco/irc
 Python Imaging Library (PIL), http://www.pythonware.com/products/pil/
 
-Install with pip:
+Installing dependencies to Raspbian:
+
 sudo pip install irc
-sudo pip install pil
+sudo apt-get install python-imaging
 
 
 Still heavily WIP and undocumented - stay tuned!
