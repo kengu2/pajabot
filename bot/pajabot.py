@@ -5,10 +5,17 @@ import sys
 import irc.client
 import irc.bot
 import traceback
+import RPi.GPIO as GPIO
+
 from irc.bot import ServerSpec
 from irc.bot import SingleServerIRCBot
+from PIL import Image,ImageStat
 
-import RPi.GPIO as GPIO
+# TODO: 
+# - Proper configuration
+# - Separate GPIO to different process
+# - Epic stuff
+
 class PajaBot(SingleServerIRCBot):
         def __init__(self):
                 spec = ServerSpec('irc.freenode.net')
@@ -52,7 +59,20 @@ class PajaBot(SingleServerIRCBot):
                         self.sayDoorStatus()
                 if cmd=='!shot':
                         os.system('/home/pi/pajabot/scripts/takeshot.sh')
-                        c.privmsg(self.channel, 'Pajalla tapahtuu: http://5w.fi/shot.jpg')
+                        im = Image.open("/tmp/shot.jpg")
+                        stat = ImageStat.Stat(im)
+                        pixelsum = stat.mean[0]+stat.mean[1]+stat.mean[2] 
+                        #print pixelsum
+                        #the true magicish
+                        if pixelsum<10:
+                            ss = 'Pretty dark, eh'
+                        else:
+                            ss = 'Pajalla tapahtuu'
+                        ss += ' (' + str(round(pixelsum)) + '): http://5w.fi/shot.jpg'
+
+                        c.privmsg(self.channel, ss)
+
+                        os.system('/home/pi/pajabot/scripts/removeshot.sh')
 
         def _dispatcher(self, c, e):
                 eventtype = e.type
