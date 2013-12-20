@@ -41,6 +41,7 @@ class PajaBot(SingleServerIRCBot):
 	def checkLights(self):
 		self.lightCheck -= 1
 		if self.lightCheck < 0:
+			print 'Checking lights..'
 			newLights = self.camera.checkLights()
 			if newLights is not self.lightStatus:
 				lss = 'Pajan valot ' + ('sammutettiin' if newLights else 'sytytettiin')
@@ -55,9 +56,9 @@ class PajaBot(SingleServerIRCBot):
                 c = self.connection
                 ds = self.doorStatus
                 dss = 'rikki'
-		if ds is GPIO.LOW:
+		if ds is False:
                         dss = 'auki'
-                if ds is GPIO_HIGH:
+                if ds is True:
                         dss = 'kiinni'
                 dss = 'Pajan ovi on ' + dss
                 c.privmsg(self.channel, dss)
@@ -94,7 +95,8 @@ class PajaBot(SingleServerIRCBot):
                 self.running = False
 		SingleServerIRCBot.die(self, 'By your command')
 		python = sys.executable
-		os.execl(python, python, * sys.argv)
+		print "Executing: " + python
+		os.execl(python)
 
 
 
