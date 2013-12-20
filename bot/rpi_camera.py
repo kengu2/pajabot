@@ -14,7 +14,8 @@ class RPiCamera():
 
 	def checkLights(self):
 		self.takeShot()
-		pixelsum = self.getPixelSum()	
+		pixelsum = self.getPixelSum()
+		print "checkLights: pixelsum is " + str(pixelsum)
 		self.removeShot()
 		return pixelsum > 50
 

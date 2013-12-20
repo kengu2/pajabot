@@ -32,6 +32,7 @@ class PajaBot(SingleServerIRCBot):
                 self._connect()
 		self.lightCheck = 0 # Check only every N loops
                 while(self.running):
+			self.checkLights()
                         try:
                                 self.ircobj.process_once(0.2)
                         except UnicodeDecodeError:
@@ -44,7 +45,7 @@ class PajaBot(SingleServerIRCBot):
 			print 'Checking lights..'
 			newLights = self.camera.checkLights()
 			if newLights is not self.lightStatus:
-				lss = 'Pajan valot ' + ('sammutettiin' if newLights else 'sytytettiin')
+				lss = 'Pajan valot ' + ('sammutettiin' if not newLights else 'sytytettiin')
 				self.connection.privmsg(self.channel, lss)
 				self.lightStatus = newLights
 			self.lightCheck = 120
@@ -93,10 +94,10 @@ class PajaBot(SingleServerIRCBot):
 
 	def restart_program(self):
 		python = sys.executable
-		print "Executing: " + python
+		#print "Executing: " + python
                 self.running = False
 		SingleServerIRCBot.die(self, 'By your command')
-		os.execl(python)
+		os.execl("/home/pi/pajabot/bot/pajabot.py")
 
 
 
