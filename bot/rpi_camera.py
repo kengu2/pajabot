@@ -14,13 +14,7 @@ class RPiCamera():
 		self.takeShot()
 		pixelsum = self.getPixelSum()	
 		self.removeShot()
-                if pixelsum<10:
-                    ss = 'Pretty dark, eh'
-                else:
-                    ss = 'Pajalla tapahtuu'
-                ss += ' (' + str(round(pixelsum)) + '): http://5w.fi/shot.jpg'
-
-                c.privmsg(self.channel, ss)
+		return pixelsum > 50
 
 	def takeShot(self):
                 os.system('/home/pi/pajabot/scripts/takeshot.sh')

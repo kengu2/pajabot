@@ -36,10 +36,10 @@ class PajaBot(SingleServerIRCBot):
                                 traceback.print_exc(file=sys.stdout)
                         time.sleep(0.5)
 
-	def checkLights():
+	def checkLights(self):
 		self.lightCheck -= 1
 		if self.lightCheck < 0:
-			newLights = camera.checkLights()
+			newLights = self.camera.checkLights()
 			if newLights is not self.lightStatus:
 				lss = 'Pajan valot ' + ('sammutettiin' if newLights else 'sytytettiin')
 				self.connection.privmsg(self.channel, lss)
@@ -71,12 +71,12 @@ class PajaBot(SingleServerIRCBot):
                 if cmd=='!valot':
                         c.privmsg(self.channel, 'Pajan valot ovat ' + ('päällä' if self.lightStatus else 'pois päältä'))
                 if cmd=='!shot':
-			camera.takeShotCommand()
+			self.camera.takeShotCommand()
 	                c.privmsg(self.channel, 'http://5w.fi/shot.jpg')
 		if cmd=='!gitpull':
 	                os.system('/home/pi/pajabot/scripts/gitpull.sh')
 	                c.privmsg(self.channel, 'Pullattu gitistä, käynnistyn uudestaan..')
-			restart_program()
+			self.restart_program()
 
         def _dispatcher(self, c, e):
                 eventtype = e.type
@@ -88,7 +88,7 @@ class PajaBot(SingleServerIRCBot):
                 print "E:" + str(source) + ", " + str(eventtype) + ", " + str(e.arguments)
                 SingleServerIRCBot._dispatcher(self, c, e)
 
-	def restart_program():
+	def restart_program(self):
                 self.running = False
 		SingleServerIRCBot.die(self, 'By your command')
 		python = sys.executable
