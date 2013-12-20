@@ -25,8 +25,8 @@ class PajaBot(SingleServerIRCBot):
                 self.running = True
                 self.channel = '#5ww'
 		self.doorStatus = None
-		self.lightStatus = camera.checkLights()
 		self.camera = RPiCamera()
+		self.lightStatus = self.camera.checkLights()
                 self._connect()
 		self.lightCheck = 0 # Check only every N loops
                 while(self.running):
