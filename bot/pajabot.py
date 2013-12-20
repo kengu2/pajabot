@@ -25,7 +25,7 @@ class PajaBot(SingleServerIRCBot):
                 spec = ServerSpec('irc.freenode.net')
                 SingleServerIRCBot.__init__(self, [spec], 'pajabot', '5w Pajabotti')
                 self.running = True
-                self.channel = '#5ww'
+                self.channel = '#5w'
 		self.doorStatus = None
 		self.camera = RPiCamera()
 		self.lightStatus = self.camera.checkLights()
@@ -92,10 +92,10 @@ class PajaBot(SingleServerIRCBot):
                 SingleServerIRCBot._dispatcher(self, c, e)
 
 	def restart_program(self):
-                self.running = False
-		SingleServerIRCBot.die(self, 'By your command')
 		python = sys.executable
 		print "Executing: " + python
+                self.running = False
+		SingleServerIRCBot.die(self, 'By your command')
 		os.execl(python)
 
 
