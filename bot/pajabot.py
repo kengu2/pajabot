@@ -1,15 +1,17 @@
+#!/usr/bin/python
+# -*- coding: latin-1 -*-
 import six
-import os
 import time
 import sys
 import irc.client
 import irc.bot
 import traceback
-import RPi.GPIO as GPIO
+import os
 
 from irc.bot import ServerSpec
 from irc.bot import SingleServerIRCBot
-from PIL import Image,ImageStat
+
+from rpi_camera import RPiCamera
 
 # TODO: 
 # - Proper configuration
@@ -21,20 +23,28 @@ class PajaBot(SingleServerIRCBot):
                 spec = ServerSpec('irc.freenode.net')
                 SingleServerIRCBot.__init__(self, [spec], 'pajabot', '5w Pajabotti')
                 self.running = True
-                self.channel = '#5w'
-                self.doorpin = 11
-                self.doorStatus = GPIO.input(self.doorpin)
+                self.channel = '#5ww'
+		self.doorStatus = None
+		self.lightStatus = camera.checkLights()
+		self.camera = RPiCamera()
                 self._connect()
+		self.lightCheck = 0 # Check only every N loops
                 while(self.running):
-                        newDs = GPIO.input(self.doorpin)
-                        if newDs is not self.doorStatus:
-                                self.doorStatus = newDs
-                                self.sayDoorStatus()
                         try:
                                 self.ircobj.process_once(0.2)
                         except UnicodeDecodeError:
                                 traceback.print_exc(file=sys.stdout)
                         time.sleep(0.5)
+
+	def checkLights():
+		self.lightCheck -= 1
+		if self.lightCheck < 0:
+			newLights = camera.checkLights()
+			if newLights is not self.lightStatus:
+				lss = 'Pajan valot ' + ('sammutettiin' if newLights else 'sytytettiin')
+				self.connection.privmsg(self.channel, lss)
+				self.lightStatus = newLights
+			self.lightCheck = 120
 
         def on_welcome(self, c, e):
                 c.join(self.channel)
@@ -42,9 +52,10 @@ class PajaBot(SingleServerIRCBot):
         def sayDoorStatus(self):
                 c = self.connection
                 ds = self.doorStatus
-                if ds == GPIO.LOW:
+                dss = 'rikki'
+		if ds is GPIO.LOW:
                         dss = 'auki'
-                else:   
+                if ds is GPIO_HIGH:
                         dss = 'kiinni'
                 dss = 'Pajan ovi on ' + dss
                 c.privmsg(self.channel, dss)
@@ -57,22 +68,15 @@ class PajaBot(SingleServerIRCBot):
                         SingleServerIRCBot.die(self, 'By your command')
                 if cmd=='!ovi':
                         self.sayDoorStatus()
+                if cmd=='!valot':
+                        c.privmsg(self.channel, 'Pajan valot ovat ' + ('päällä' if self.lightStatus else 'pois päältä'))
                 if cmd=='!shot':
-                        os.system('/home/pi/pajabot/scripts/takeshot.sh')
-                        im = Image.open("/tmp/shot.jpg")
-                        stat = ImageStat.Stat(im)
-                        pixelsum = stat.mean[0]+stat.mean[1]+stat.mean[2] 
-                        #print pixelsum
-                        #the true magicish
-                        if pixelsum<10:
-                            ss = 'Pretty dark, eh'
-                        else:
-                            ss = 'Pajalla tapahtuu'
-                        ss += ' (' + str(round(pixelsum)) + '): http://5w.fi/shot.jpg'
-
-                        c.privmsg(self.channel, ss)
-
-                        os.system('/home/pi/pajabot/scripts/removeshot.sh')
+			camera.takeShotCommand()
+	                c.privmsg(self.channel, 'http://5w.fi/shot.jpg')
+		if cmd=='!gitpull':
+	                os.system('/home/pi/pajabot/scripts/gitpull.sh')
+	                c.privmsg(self.channel, 'Pullattu gitistä, käynnistyn uudestaan..')
+			restart_program()
 
         def _dispatcher(self, c, e):
                 eventtype = e.type
@@ -84,10 +88,13 @@ class PajaBot(SingleServerIRCBot):
                 print "E:" + str(source) + ", " + str(eventtype) + ", " + str(e.arguments)
                 SingleServerIRCBot._dispatcher(self, c, e)
 
-GPIO.setmode(GPIO.BOARD)
-GPIO.setup(11, GPIO.IN)
+	def restart_program():
+                self.running = False
+		SingleServerIRCBot.die(self, 'By your command')
+		python = sys.executable
+		os.execl(python, python, * sys.argv)
+
+
 
 bot = PajaBot()
-
-GPIO.cleanup()
 
