@@ -1,4 +1,4 @@
 #!/bin/sh
-raspistill -vf -hf -o /tmp/shot.jpg
+raspistill -o /tmp/shot.jpg
 
 
