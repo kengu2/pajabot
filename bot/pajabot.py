@@ -76,7 +76,6 @@ class PajaBot(SingleServerIRCBot):
 
         def on_pubmsg(self, c, e):
                 cmd = e.arguments[0]
-                print 'Komento: ' + cmd
                 if cmd=='!kuole':
                         self.running = False
                         SingleServerIRCBot.die(self, 'By your command')
@@ -91,6 +90,9 @@ class PajaBot(SingleServerIRCBot):
 	                os.system('/home/pi/pajabot/scripts/gitpull.sh')
 	                c.privmsg(self.channel, 'Pullattu gitistä, käynnistyn uudestaan..')
 			self.restart_program()
+                if cmd=='!update':
+ 	                self.updateStatus()
+	                c.privmsg(self.channel, 'Done')
 
         def _dispatcher(self, c, e):
                 eventtype = e.type
@@ -99,7 +101,6 @@ class PajaBot(SingleServerIRCBot):
                         source = str(source)
                 else:
                         source = ''
-                print "E:" + str(source) + ", " + str(eventtype) + ", " + str(e.arguments)
                 SingleServerIRCBot._dispatcher(self, c, e)
 
 	def restart_program(self):
@@ -108,7 +109,6 @@ class PajaBot(SingleServerIRCBot):
                 self.running = False
 		SingleServerIRCBot.die(self, 'By your command')
 		os.execl("/home/pi/pajabot/bot/pajabot.py")
-
 
 
 bot = PajaBot()
