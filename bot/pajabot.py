@@ -31,6 +31,8 @@ class PajaBot(SingleServerIRCBot):
 		self.lightStatus = self.camera.checkLights()
                 self._connect()
 		self.lightCheck = 0 # Check only every N loops
+		self.statusMessage = "Hello world"
+
                 while(self.running):
 			self.checkLights()
                         try:
@@ -52,12 +54,10 @@ class PajaBot(SingleServerIRCBot):
 			self.lightCheck = 120
 
 	def updateStatus(self):
-		openstatus = "false"
-		statusmessage = "Nobody is at lab"
-		if self.lightStatus:
-			openstatus = "true"
-			statusmessage = "The lab is manned"
-		os.system('/home/pi/pajabot/scripts/updatestatus.sh ' + openstatus + ' "' + statusmessage + '"')
+		openstatus = ('true' if self.lightStatus else 'false')
+		self.statusMessage = ('The lab is manned' if self.lightStatus else 'No one here atm')
+		print 'Updating status: ' + openstatus + ', ' + self.statusMessage
+		os.system('/home/pi/pajabot/scripts/updatestatus.sh ' + openstatus + ' "' + self.statusMessage + '"')
 		self.camera.takeShotCommand()
 
         def on_welcome(self, c, e):
