@@ -66,7 +66,7 @@ class PajaBot(SingleServerIRCBot):
 
         def on_pubmsg(self, c, e):
                 cmd = e.arguments[0]
-                print 'Komento: ' + cmd
+                print 'Komento: ' + str(cmd)
                 if cmd=='!kuole':
                         self.running = False
                         SingleServerIRCBot.die(self, 'By your command')
