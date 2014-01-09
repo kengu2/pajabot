@@ -48,7 +48,17 @@ class PajaBot(SingleServerIRCBot):
 				lss = 'Pajan valot ' + ('sammutettiin' if not newLights else 'sytytettiin')
 				self.connection.privmsg(self.channel, lss)
 				self.lightStatus = newLights
+				self.updateStatus()
 			self.lightCheck = 120
+
+	def updateStatus(self):
+		openstatus = "false"
+		statusmessage = "Nobody is at lab"
+		if self.lightStatus:
+			openstatus = "true"
+			statusmessage = "The lab is manned"
+		os.system('/home/pi/pajabot/scripts/updatestatus.sh ' + openstatus + ' "' + statusmessage + '"')
+		self.camera.takeShotCommand()
 
         def on_welcome(self, c, e):
                 c.join(self.channel)
