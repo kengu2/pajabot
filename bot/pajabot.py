@@ -5,6 +5,7 @@ reload(sys)
 sys.setdefaultencoding('utf8')
 import six
 import time
+import datetime
 import irc.client
 import irc.bot
 import traceback
@@ -32,6 +33,7 @@ class PajaBot(SingleServerIRCBot):
                 self._connect()
 		self.lightCheck = 0 # Check only every N loops
 		self.statusMessage = "Hello world"
+		self.timestamp = datetime.datetime.now()
 
                 while(self.running):
 			self.checkLights()
@@ -47,9 +49,12 @@ class PajaBot(SingleServerIRCBot):
 			print 'Checking lights..'
 			newLights = self.camera.checkLights()
 			if newLights is not self.lightStatus:
-				lss = 'Pajan valot ' + ('sammutettiin' if not newLights else 'sytytettiin')
+				newTimestamp = datetime.datetime.now()
+				timeDelta = str(newTimestamp - self.timestamp).split('.')[0]
+				lss = 'Pajan valot ' + ('sammutettiin (valot päällä ' if not newLights else 'sytytettiin (pimeyttä kesti ') + timeDelta + ')'
 				self.connection.privmsg(self.channel, lss)
 				self.lightStatus = newLights
+				self.timestamp = newTimestamp
 				self.updateStatus()
 			self.lightCheck = 120
 
@@ -85,7 +90,7 @@ class PajaBot(SingleServerIRCBot):
                         c.privmsg(self.channel, 'Pajan valot ovat ' + ('päällä' if self.lightStatus else 'pois päältä'))
                 if cmd=='!shot':
 			self.camera.takeShotCommand()
-	                c.privmsg(self.channel, 'http://5w.fi/shot.jpg')
+	                c.privmsg(self.channel, 'http://5w.fi/shot.jpg' + ('' if self.lightStatus else ' (pajalla pimeää)'))
 		if cmd=='!gitpull':
 	                os.system('/home/pi/pajabot/scripts/gitpull.sh')
 	                c.privmsg(self.channel, 'Pullattu gitistä, käynnistyn uudestaan..')
