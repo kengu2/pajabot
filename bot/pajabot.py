@@ -16,6 +16,9 @@ from irc.bot import SingleServerIRCBot
 
 from rpi_camera import RPiCamera
 
+from subprocess import Popen
+
+
 # TODO: 
 # - Proper configuration
 # - Separate GPIO to different process
@@ -109,11 +112,11 @@ class PajaBot(SingleServerIRCBot):
                 SingleServerIRCBot._dispatcher(self, c, e)
 
 	def restart_program(self):
-		python = sys.executable
-		#print "Executing: " + python
-                self.running = False
+
+		print ('Restarting')
+		Popen("/home/pi/pajabot/bot/pajabot.py", shell=False)
 		SingleServerIRCBot.die(self, 'By your command')
-		os.execl("/home/pi/pajabot/bot/pajabot.py")
+		exit("updating")
 
 
 bot = PajaBot()
