@@ -10,6 +10,7 @@ import irc.client
 import irc.bot
 import traceback
 import os
+import ConfigParser
 
 from irc.bot import ServerSpec
 from irc.bot import SingleServerIRCBot
@@ -24,12 +25,27 @@ from subprocess import Popen
 # - Separate GPIO to different process
 # - Epic stuff
 
+config = ConfigParser.ConfigParser()
+config.read('/home/pi/pajabot/bot.conf')
+
+server = config.get("bot","server")
+ircchannel = config.get("bot","channel")
+nick = config.get("bot","nick")
+realname = config.get("bot","realname")
+
+messageasaction = False
+
+print server
+print ircchannel
+print nick
+print realname
+
 class PajaBot(SingleServerIRCBot):
         def __init__(self):
-                spec = ServerSpec('irc.freenode.net')
-                SingleServerIRCBot.__init__(self, [spec], 'pajabot', '5w Pajabotti')
+                spec = ServerSpec(server)
+                SingleServerIRCBot.__init__(self, [spec], nick, realname)
                 self.running = True
-                self.channel = '#5w'
+                self.channel = ircchannel
 		self.doorStatus = None
 		self.camera = RPiCamera()
 		self.lightStatus = self.camera.checkLights()
@@ -55,11 +71,18 @@ class PajaBot(SingleServerIRCBot):
 				newTimestamp = datetime.datetime.now()
 				timeDelta = str(newTimestamp - self.timestamp).split('.')[0]
 				lss = 'Pajan valot ' + ('sammutettiin (valot päällä ' if not newLights else 'sytytettiin (pimeyttä kesti ') + timeDelta + ')'
-				self.connection.privmsg(self.channel, lss)
+				self.say(lss)
 				self.lightStatus = newLights
 				self.timestamp = newTimestamp
 				self.updateStatus()
 			self.lightCheck = 120
+
+	def say(self, text):
+		if messageasaction:
+			self.connection.action(self.channel, text)
+		else:
+			self.connection.privmsg(self.channel, text)
+			
 
 	def updateStatus(self):
 		openstatus = ('true' if self.lightStatus else 'false')
@@ -80,7 +103,7 @@ class PajaBot(SingleServerIRCBot):
                 if ds is True:
                         dss = 'kiinni'
                 dss = 'Pajan ovi on ' + dss
-                c.privmsg(self.channel, dss)
+                self.say(dss)
 
         def on_pubmsg(self, c, e):
                 cmd = e.arguments[0]
@@ -90,7 +113,7 @@ class PajaBot(SingleServerIRCBot):
                 if cmd=='!ovi':
                         self.sayDoorStatus()
                 if cmd=='!valot':
-                        c.privmsg(self.channel, 'Pajan valot ovat ' + ('päällä' if self.lightStatus else 'pois päältä'))
+                        self.say('Pajan valot ovat ' + ('päällä' if self.lightStatus else 'pois päältä'))
                 if cmd=='!shot':
 			self.camera.takeShotCommand()
 	                c.privmsg(self.channel, 'http://5w.fi/shot.jpg' + ('' if self.lightStatus else ' (pajalla pimeää)'))
