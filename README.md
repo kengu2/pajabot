@@ -1,7 +1,7 @@
 pajabot
 =======
 
-IRC bot &amp; utilities for hackerspace menangement. Target hw: Raspberry pi.
+IRC bot &amp; utilities for hackerspace management. Target hw: Raspberry pi.
 
 Dependencies:
 Python irclib, https://bitbucket.org/jaraco/irc

@@ -10,6 +10,8 @@ import irc.client
 import irc.bot
 import traceback
 import os
+import ConfigParser
+import feedparser
 
 from irc.bot import ServerSpec
 from irc.bot import SingleServerIRCBot
@@ -24,27 +26,85 @@ from subprocess import Popen
 # - Separate GPIO to different process
 # - Epic stuff
 
+config = ConfigParser.ConfigParser()
+config.read('/home/pi/pajabot/bot.conf')
+
+server = config.get("bot","server")
+ircchannel = config.get("bot","channel")
+nick = config.get("bot","nick")
+realname = config.get("bot","realname")
+shoturl = config.get("bot","shoturl")
+
+messageasaction = config.getboolean("bot","messageasaction")
+vaasa = config.getboolean("bot","vaasa")
+
+try:
+	password = config.get("bot","password")
+except ConfigParser.NoOptionError:
+	print "no password"
+	password = ''
+
+try:
+	rss_url = config.get("vaasa","rss")
+except ConfigParser.NoOptionError:
+	print "not in vaasa?"
+	rss_url = ''
+
+rss_timestamp = ''
+
+print server
+print ircchannel
+print nick
+print realname
+print messageasaction
+print vaasa
+print rss_url
+print password
+
 class PajaBot(SingleServerIRCBot):
         def __init__(self):
-                spec = ServerSpec('irc.freenode.net')
-                SingleServerIRCBot.__init__(self, [spec], 'pajabot', '5w Pajabotti')
+                spec = ServerSpec(server)
+                SingleServerIRCBot.__init__(self, [spec], nick, realname)
                 self.running = True
-                self.channel = '#5w'
-		self.doorStatus = None
-		self.camera = RPiCamera()
-		self.lightStatus = self.camera.checkLights()
+                self.channel = ircchannel
+                self.doorStatus = None
+                self.camera = RPiCamera()
+                self.lightStatus = self.camera.checkLights()
                 self._connect()
-		self.lightCheck = 0 # Check only every N loops
-		self.statusMessage = "Hello world"
-		self.timestamp = datetime.datetime.now()
+                self.lightCheck = 0 # Check only every N loops
+                self.statusMessage = "Hello world"
+                self.timestamp = datetime.datetime.now()
 
                 while(self.running):
-			self.checkLights()
+                        self.checkLights()
+                        if (vaasa): self.read_feed()
                         try:
                                 self.ircobj.process_once(0.2)
                         except UnicodeDecodeError:
                                 traceback.print_exc(file=sys.stdout)
                         time.sleep(0.5)
+
+
+	def read_feed(self):
+		c = self.connection
+		global rss_timestamp
+
+		rssfeed = feedparser.parse(rss_url)
+		if len(rssfeed.entries)>0:
+			latest = rssfeed.entries[len(rssfeed.entries)-1]
+            
+			if latest.id in rss_timestamp:
+				variable = 2           
+			else: 
+				rss_timestamp = latest.id
+				try:
+					self.say("door opened by " + latest.title)
+					print "new openings " + latest.title
+				except:
+					print "not connected"
+
+
+
 
 	def checkLights(self):
 		self.lightCheck -= 1
@@ -54,12 +114,19 @@ class PajaBot(SingleServerIRCBot):
 			if newLights is not self.lightStatus:
 				newTimestamp = datetime.datetime.now()
 				timeDelta = str(newTimestamp - self.timestamp).split('.')[0]
-				lss = 'Pajan valot ' + ('sammutettiin (valot päällä ' if not newLights else 'sytytettiin (pimeyttä kesti ') + timeDelta + ')'
-				self.connection.privmsg(self.channel, lss)
+				lss = 'lights ' + ('went off (lights on for' if not newLights else 'on (darkness for ') + timeDelta + ')'
+				self.say(lss)
 				self.lightStatus = newLights
 				self.timestamp = newTimestamp
 				self.updateStatus()
 			self.lightCheck = 120
+
+	def say(self, text):
+		if messageasaction:
+			self.connection.action(self.channel, text)
+		else:
+			self.connection.privmsg(self.channel, text)
+			
 
 	def updateStatus(self):
 		openstatus = ('true' if self.lightStatus else 'false')
@@ -70,6 +137,8 @@ class PajaBot(SingleServerIRCBot):
 
         def on_welcome(self, c, e):
                 c.join(self.channel)
+                if (password!=''): c.privmsg("nickserv", "IDENTIFY " + password)
+
 
         def sayDoorStatus(self):
                 c = self.connection
@@ -80,20 +149,24 @@ class PajaBot(SingleServerIRCBot):
                 if ds is True:
                         dss = 'kiinni'
                 dss = 'Pajan ovi on ' + dss
-                c.privmsg(self.channel, dss)
+                self.say(dss)
+
+        def on_nicknameinuse(self, c, e):
+            c.nick(c.get_nickname() + "_")
+
 
         def on_pubmsg(self, c, e):
                 cmd = e.arguments[0]
                 if cmd=='!kuole':
                         self.running = False
                         SingleServerIRCBot.die(self, 'By your command')
-                if cmd=='!ovi':
+                if (cmd=='!ovi') or (cmd=='!door'):
                         self.sayDoorStatus()
-                if cmd=='!valot':
-                        c.privmsg(self.channel, 'Pajan valot ovat ' + ('päällä' if self.lightStatus else 'pois päältä'))
+                if (cmd=='!valot') or (cmd=='!lights'):
+                        self.say('lights are ' + ('on' if self.lightStatus else 'off'))
                 if cmd=='!shot':
 			self.camera.takeShotCommand()
-	                c.privmsg(self.channel, 'http://5w.fi/shot.jpg' + ('' if self.lightStatus else ' (pajalla pimeää)'))
+	                c.privmsg(self.channel, shoturl + ('' if self.lightStatus else ' (pretty dark, eh)'))
 		if cmd=='!gitpull':
 	                os.system('/home/pi/pajabot/scripts/gitpull.sh')
 	                c.privmsg(self.channel, 'Pullattu gitistä, käynnistyn uudestaan..')
