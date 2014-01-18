@@ -163,10 +163,10 @@ class PajaBot(SingleServerIRCBot):
                 if (cmd=='!ovi') or (cmd=='!door'):
                         self.sayDoorStatus()
                 if (cmd=='!valot') or (cmd=='!lights'):
-                        self.say('Pajan valot ovat ' + ('päällä' if self.lightStatus else 'pois päältä'))
+                        self.say('lights are ' + ('on' if self.lightStatus else 'off'))
                 if cmd=='!shot':
 			self.camera.takeShotCommand()
-	                c.privmsg(self.channel, shoturl + ('' if self.lightStatus else ' (pajalla pimeää)'))
+	                c.privmsg(self.channel, shoturl + ('' if self.lightStatus else ' (pretty dark, eh)'))
 		if cmd=='!gitpull':
 	                os.system('/home/pi/pajabot/scripts/gitpull.sh')
 	                c.privmsg(self.channel, 'Pullattu gitistä, käynnistyn uudestaan..')
