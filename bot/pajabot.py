@@ -11,6 +11,7 @@ import irc.bot
 import traceback
 import os
 import ConfigParser
+import feedparser
 
 from irc.bot import ServerSpec
 from irc.bot import SingleServerIRCBot
@@ -32,13 +33,33 @@ server = config.get("bot","server")
 ircchannel = config.get("bot","channel")
 nick = config.get("bot","nick")
 realname = config.get("bot","realname")
+shoturl = config.get("bot","shoturl")
 
-messageasaction = False
+messageasaction = config.getboolean("bot","messageasaction")
+vaasa = config.getboolean("bot","vaasa")
+
+try:
+	password = config.get("bot","password")
+except ConfigParser.NoOptionError:
+	print "no password"
+	password = ''
+
+try:
+	rss_url = config.get("vaasa","rss")
+except ConfigParser.NoOptionError:
+	print "not in vaasa?"
+	rss_url = ''
+
+rss_timestamp = ''
 
 print server
 print ircchannel
 print nick
 print realname
+print messageasaction
+print vaasa
+print rss_url
+print password
 
 class PajaBot(SingleServerIRCBot):
         def __init__(self):
@@ -46,21 +67,44 @@ class PajaBot(SingleServerIRCBot):
                 SingleServerIRCBot.__init__(self, [spec], nick, realname)
                 self.running = True
                 self.channel = ircchannel
-		self.doorStatus = None
-		self.camera = RPiCamera()
-		self.lightStatus = self.camera.checkLights()
+                self.doorStatus = None
+                self.camera = RPiCamera()
+                self.lightStatus = self.camera.checkLights()
                 self._connect()
-		self.lightCheck = 0 # Check only every N loops
-		self.statusMessage = "Hello world"
-		self.timestamp = datetime.datetime.now()
+                self.lightCheck = 0 # Check only every N loops
+                self.statusMessage = "Hello world"
+                self.timestamp = datetime.datetime.now()
 
                 while(self.running):
-			self.checkLights()
+                        self.checkLights()
+                        if (vaasa): self.read_feed()
                         try:
                                 self.ircobj.process_once(0.2)
                         except UnicodeDecodeError:
                                 traceback.print_exc(file=sys.stdout)
                         time.sleep(0.5)
+
+
+	def read_feed(self):
+		c = self.connection
+		global rss_timestamp
+
+		rssfeed = feedparser.parse(rss_url)
+		if len(rssfeed.entries)>0:
+			latest = rssfeed.entries[len(rssfeed.entries)-1]
+            
+			if latest.id in rss_timestamp:
+				variable = 2           
+			else: 
+				rss_timestamp = latest.id
+				try:
+					self.say("door opened by " + latest.title)
+					print "new openings " + latest.title
+				except:
+					print "not connected"
+
+
+
 
 	def checkLights(self):
 		self.lightCheck -= 1
@@ -70,7 +114,7 @@ class PajaBot(SingleServerIRCBot):
 			if newLights is not self.lightStatus:
 				newTimestamp = datetime.datetime.now()
 				timeDelta = str(newTimestamp - self.timestamp).split('.')[0]
-				lss = 'Pajan valot ' + ('sammutettiin (valot päällä ' if not newLights else 'sytytettiin (pimeyttä kesti ') + timeDelta + ')'
+				lss = 'lights ' + ('went off (lights on for' if not newLights else 'on (darkness for ') + timeDelta + ')'
 				self.say(lss)
 				self.lightStatus = newLights
 				self.timestamp = newTimestamp
@@ -93,6 +137,8 @@ class PajaBot(SingleServerIRCBot):
 
         def on_welcome(self, c, e):
                 c.join(self.channel)
+                if (password!=''): c.privmsg("nickserv", "IDENTIFY " + password)
+
 
         def sayDoorStatus(self):
                 c = self.connection
@@ -105,14 +151,18 @@ class PajaBot(SingleServerIRCBot):
                 dss = 'Pajan ovi on ' + dss
                 self.say(dss)
 
+        def on_nicknameinuse(self, c, e):
+            c.nick(c.get_nickname() + "_")
+
+
         def on_pubmsg(self, c, e):
                 cmd = e.arguments[0]
                 if cmd=='!kuole':
                         self.running = False
                         SingleServerIRCBot.die(self, 'By your command')
-                if cmd=='!ovi':
+                if (cmd=='!ovi') or (cmd=='!door'):
                         self.sayDoorStatus()
-                if cmd=='!valot':
+                if (cmd=='!valot') or (cmd=='!lights'):
                         self.say('Pajan valot ovat ' + ('päällä' if self.lightStatus else 'pois päältä'))
                 if cmd=='!shot':
 			self.camera.takeShotCommand()
