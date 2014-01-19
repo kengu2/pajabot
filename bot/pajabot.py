@@ -114,7 +114,7 @@ class PajaBot(SingleServerIRCBot):
 			if newLights is not self.lightStatus:
 				newTimestamp = datetime.datetime.now()
 				timeDelta = str(newTimestamp - self.timestamp).split('.')[0]
-				lss = 'lights ' + ('went off (lights on for' if not newLights else 'on (darkness for ') + timeDelta + ')'
+				lss = 'lights ' + ('went off (lights on for ' if not newLights else 'on (darkness for ') + timeDelta + ')'
 				self.say(lss)
 				self.lightStatus = newLights
 				self.timestamp = newTimestamp
