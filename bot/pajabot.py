@@ -165,7 +165,7 @@ class PajaBot(SingleServerIRCBot):
                 if (cmd=='!valot') or (cmd=='!lights'):
                         self.say('lights are ' + ('on' if self.lightStatus else 'off'))
                 if (cmd=='!checksum') or (cmd=='!checksum'):
-                        self.say('pixelvar: ' + self.camera.checkSum)
+                        self.say('pixelvar: ' + str(self.camera.checkSum))
 
 
                 if cmd=='!shot':
@@ -173,7 +173,7 @@ class PajaBot(SingleServerIRCBot):
 	                c.privmsg(self.channel, shoturl + ('' if self.lightStatus else ' (pretty dark, eh)'))
 		if cmd=='!gitpull':
 	                os.system('/home/pi/pajabot/scripts/gitpull.sh')
-	                c.privmsg(self.channel, 'Pullattu gitistä, käynnistyn uudestaan..')
+	                c.privmsg(self.channel, 'Pulled from git, restarting..')
 			self.restart_program()
                 if cmd=='!update':
  	                self.updateStatus()
