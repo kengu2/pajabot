@@ -165,7 +165,7 @@ class PajaBot(SingleServerIRCBot):
                 if (cmd=='!valot') or (cmd=='!lights'):
                         self.say('lights are ' + ('on' if self.lightStatus else 'off'))
                 if (cmd=='!checksum') or (cmd=='!checksum'):
-                        self.say('pixelvar: ' + str(self.camera.checkSum))
+                        self.say('pixelvar: ' + str(self.camera.checkSum()))
 
 
                 if cmd=='!shot':
