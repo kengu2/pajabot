@@ -33,6 +33,15 @@ class RPiCamera():
                 stat = ImageStat.Stat(im)
                 pixelsum = stat.mean[0]+stat.mean[1]+stat.mean[2] 
                 print stat.var[0]+stat.var[1]+stat.var[2]
+                return pixelsum
 
-		return pixelsum
+	def checkSum(self):
+		self.takeShot()
+		im = Image.open("/tmp/shot.jpg")
+		stat = ImageStat.Stat(im)
+		pixelsum = stat.mean[0]+stat.mean[1]+stat.mean[2] 
+		pixelvar = stat.var[0]+stat.var[1]+stat.var[2]
+		self.uploadShot()
+		self.removeShot()
+		return pixelvar
 

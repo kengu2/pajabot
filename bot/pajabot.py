@@ -164,6 +164,10 @@ class PajaBot(SingleServerIRCBot):
                         self.sayDoorStatus()
                 if (cmd=='!valot') or (cmd=='!lights'):
                         self.say('lights are ' + ('on' if self.lightStatus else 'off'))
+                if (cmd=='!checksum') or (cmd=='!checksum'):
+                        self.say('pixelvar: ' + self.camera.checkSum)
+
+
                 if cmd=='!shot':
 			self.camera.takeShotCommand()
 	                c.privmsg(self.channel, shoturl + ('' if self.lightStatus else ' (pretty dark, eh)'))
