@@ -114,7 +114,7 @@ class PajaBot(SingleServerIRCBot):
 			if newLights is not self.lightStatus:
 				newTimestamp = datetime.datetime.now()
 				timeDelta = str(newTimestamp - self.timestamp).split('.')[0]
-				lss = 'lights ' + ('went off (lights on for ' if not newLights else 'on (darkness for ') + timeDelta + ')'
+				lss = 'lights ' + ('went off (lights were illuminated for ' if not newLights else 'on (darkness had fallen for ') + timeDelta + ')'
 				self.say(lss)
 				self.lightStatus = newLights
 				self.timestamp = newTimestamp
@@ -164,12 +164,16 @@ class PajaBot(SingleServerIRCBot):
                         self.sayDoorStatus()
                 if (cmd=='!valot') or (cmd=='!lights'):
                         self.say('lights are ' + ('on' if self.lightStatus else 'off'))
+                if (cmd=='!checksum') or (cmd=='!checksum'):
+                        self.say('pixelvar: ' + str(self.camera.checkSum()))
+
+
                 if cmd=='!shot':
 			self.camera.takeShotCommand()
 	                c.privmsg(self.channel, shoturl + ('' if self.lightStatus else ' (pretty dark, eh)'))
 		if cmd=='!gitpull':
 	                os.system('/home/pi/pajabot/scripts/gitpull.sh')
-	                c.privmsg(self.channel, 'Pullattu gitistä, käynnistyn uudestaan..')
+	                c.privmsg(self.channel, 'Pulled from git, restarting..')
 			self.restart_program()
                 if cmd=='!update':
  	                self.updateStatus()
