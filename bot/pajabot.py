@@ -74,6 +74,7 @@ class PajaBot(SingleServerIRCBot):
                 self.lightCheck = 0 # Check only every N loops
                 self.statusMessage = "Hello world"
                 self.timestamp = datetime.datetime.now()
+                self.updateStatus()
 
                 while(self.running):
                         self.checkLights()
