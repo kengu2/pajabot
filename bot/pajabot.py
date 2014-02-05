@@ -52,6 +52,7 @@ except ConfigParser.NoOptionError:
 
 rss_timestamp = ''
 
+print "-- config --"
 print server
 print ircchannel
 print nick
@@ -60,6 +61,7 @@ print messageasaction
 print vaasa
 print rss_url
 print password
+print "-- end config --"
 
 class PajaBot(SingleServerIRCBot):
         def __init__(self):
@@ -82,7 +84,11 @@ class PajaBot(SingleServerIRCBot):
                         try:
                                 self.ircobj.process_once(0.2)
                         except UnicodeDecodeError:
-                                traceback.print_exc(file=sys.stdout)
+				print 'Somebody said something in non-utf8'
+#                                traceback.print_exc(file=sys.stdout)
+			except irc.client.ServerNotConnectedError:
+				print 'Not connected. Cant do anything atm.'
+
                         time.sleep(0.5)
 
 
@@ -110,7 +116,7 @@ class PajaBot(SingleServerIRCBot):
 	def checkLights(self):
 		self.lightCheck -= 1
 		if self.lightCheck < 0:
-			print 'Checking lights..'
+#			print 'Checking lights..'
 			newLights = self.camera.checkLights()
 			if newLights is not self.lightStatus:
 				newTimestamp = datetime.datetime.now()
