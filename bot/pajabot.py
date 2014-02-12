@@ -150,12 +150,12 @@ class PajaBot(SingleServerIRCBot):
         def sayDoorStatus(self):
                 c = self.connection
                 ds = self.doorStatus
-                dss = 'rikki'
+                dss = 'broken'
 		if ds is False:
-                        dss = 'auki'
+                        dss = 'open'
                 if ds is True:
-                        dss = 'kiinni'
-                dss = 'Pajan ovi on ' + dss
+                        dss = 'closed'
+                dss = 'door is ' + dss
                 self.say(dss)
 
         def on_nicknameinuse(self, c, e):
