@@ -18,7 +18,9 @@ from irc.bot import SingleServerIRCBot
 
 from rpi_camera import RPiCamera
 
-from subprocess import Popen
+import subprocess
+
+#from subprocess import Popen
 
 
 # TODO: 
@@ -179,7 +181,7 @@ class PajaBot(SingleServerIRCBot):
                 if (cmd=='!checksum') or (cmd=='!checksum'):
                         self.say('pixelvar: ' + str(self.camera.checkSum()))
                 if (cmd=='!printer') or (cmd=='!tulostin'):
-                        ping_response = Popen(["/bin/ping", "-c1", "-w100", "8.8.8.8"], stdout=subprocess.PIPE).stdout.read()
+                        ping_response = subprocess.Popen(["/bin/ping", "-c1", "-w100", "8.8.8.8"], stdout=subprocess.PIPE).stdout.read()
                         self.say('p: ' + str(ping_response))
 
 
@@ -207,7 +209,7 @@ class PajaBot(SingleServerIRCBot):
 	def restart_program(self):
 
 		print ('Restarting')
-		Popen("/home/pi/pajabot/bot/pajabot.py", shell=False)
+		subprocess.Popen("/home/pi/pajabot/bot/pajabot.py", shell=False)
 		SingleServerIRCBot.die(self, 'By your command')
 		exit("updating")
 
