@@ -29,7 +29,7 @@ from subprocess import Popen
 config = ConfigParser.ConfigParser()
 
 configfile = '/home/pi/pajabot/bot.conf' 
-if (os.path.isfile('/home/pi/pajabot/local.conf'):
+if (os.path.isfile('/home/pi/pajabot/local.conf')):
 	configfile = '/home/pi/pajabot/local.conf'
 
 config.read(configfile)
