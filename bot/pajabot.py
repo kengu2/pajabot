@@ -179,7 +179,7 @@ class PajaBot(SingleServerIRCBot):
                 if (cmd=='!checksum') or (cmd=='!checksum'):
                         self.say('pixelvar: ' + str(self.camera.checkSum()))
                 if (cmd=='!printer') or (cmd=='!tulostin'):
-                        ping_response = subprocess.Popen(["/bin/ping", "-c1", "-w100", "8.8.8.8"], stdout=subprocess.PIPE).stdout.read()
+                        ping_response = Popen(["/bin/ping", "-c1", "-w100", "8.8.8.8"], stdout=subprocess.PIPE).stdout.read()
                         self.say('p: ' + str(ping_response))
 
 
