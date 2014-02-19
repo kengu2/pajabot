@@ -27,7 +27,12 @@ from subprocess import Popen
 # - Epic stuff
 
 config = ConfigParser.ConfigParser()
-config.read('/home/pi/pajabot/bot.conf')
+
+configfile = '/home/pi/pajabot/bot.conf' 
+if (os.path.isfile('/home/pi/pajabot/local.conf'):
+	configfile = '/home/pi/pajabot/local.conf'
+
+config.read(configfile)
 
 server = config.get("bot","server")
 ircchannel = config.get("bot","channel")
