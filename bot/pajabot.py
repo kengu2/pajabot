@@ -18,7 +18,7 @@ from irc.bot import SingleServerIRCBot
 
 from rpi_camera import RPiCamera
 
-from subprocess import Popen
+import subprocess
 
 
 # TODO: 
@@ -27,7 +27,12 @@ from subprocess import Popen
 # - Epic stuff
 
 config = ConfigParser.ConfigParser()
-config.read('/home/pi/pajabot/bot.conf')
+
+configfile = '/home/pi/pajabot/bot.conf' 
+if (os.path.isfile('/home/pi/pajabot/local.conf')):
+	configfile = '/home/pi/pajabot/local.conf'
+
+config.read(configfile)
 
 server = config.get("bot","server")
 ircchannel = config.get("bot","channel")
@@ -37,6 +42,8 @@ shoturl = config.get("bot","shoturl")
 
 messageasaction = config.getboolean("bot","messageasaction")
 vaasa = config.getboolean("bot","vaasa")
+printer_ip = config.get("bot","printer")
+
 
 try:
 	password = config.get("bot","password")
@@ -61,6 +68,7 @@ print messageasaction
 print vaasa
 print rss_url
 print password
+print printer_ip
 print "-- end config --"
 
 class PajaBot(SingleServerIRCBot):
@@ -150,12 +158,12 @@ class PajaBot(SingleServerIRCBot):
         def sayDoorStatus(self):
                 c = self.connection
                 ds = self.doorStatus
-                dss = 'rikki'
+                dss = 'broken'
 		if ds is False:
-                        dss = 'auki'
+                        dss = 'open'
                 if ds is True:
-                        dss = 'kiinni'
-                dss = 'Pajan ovi on ' + dss
+                        dss = 'closed'
+                dss = 'door is ' + dss
                 self.say(dss)
 
         def on_nicknameinuse(self, c, e):
@@ -173,6 +181,14 @@ class PajaBot(SingleServerIRCBot):
                         self.say('lights are ' + ('on' if self.lightStatus else 'off'))
                 if (cmd=='!checksum') or (cmd=='!checksum'):
                         self.say('pixelvar: ' + str(self.camera.checkSum()))
+                if (cmd=='!printer') or (cmd=='!tulostin'):
+                        ping_response = subprocess.Popen(["/bin/ping", "-c1", "-w2", printer_ip], stdout=subprocess.PIPE).stdout.read()
+                        if ('rtt' in ping_response):
+                          self.say('printer is online')
+                        else:
+                          self.say('printer is offline')
+                        print('p: ' + str(ping_response))
+
 
 
                 if cmd=='!shot':
@@ -198,7 +214,7 @@ class PajaBot(SingleServerIRCBot):
 	def restart_program(self):
 
 		print ('Restarting')
-		Popen("/home/pi/pajabot/bot/pajabot.py", shell=False)
+		subprocess.Popen("/home/pi/pajabot/bot/pajabot.py", shell=False)
 		SingleServerIRCBot.die(self, 'By your command')
 		exit("updating")
 
