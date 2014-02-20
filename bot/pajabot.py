@@ -182,6 +182,10 @@ class PajaBot(SingleServerIRCBot):
                         self.say('pixelvar: ' + str(self.camera.checkSum()))
                 if (cmd=='!printer') or (cmd=='!tulostin'):
                         ping_response = subprocess.Popen(["/bin/ping", "-c1", "-w100", "8.8.8.8"], stdout=subprocess.PIPE).stdout.read()
+                        if ('unreachable' in ping_response):
+                          self.say('printer is offline')
+                        else:
+                          self.say('printer is online')
                         print('p: ' + str(ping_response))
 #                        self.say('p: ' + str(ping_response))
 
