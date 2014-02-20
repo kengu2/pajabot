@@ -44,6 +44,8 @@ shoturl = config.get("bot","shoturl")
 
 messageasaction = config.getboolean("bot","messageasaction")
 vaasa = config.getboolean("bot","vaasa")
+printer_ip = config.get("bot","printer")
+
 
 try:
 	password = config.get("bot","password")
@@ -68,6 +70,7 @@ print messageasaction
 print vaasa
 print rss_url
 print password
+print printer_ip
 print "-- end config --"
 
 class PajaBot(SingleServerIRCBot):
@@ -181,7 +184,7 @@ class PajaBot(SingleServerIRCBot):
                 if (cmd=='!checksum') or (cmd=='!checksum'):
                         self.say('pixelvar: ' + str(self.camera.checkSum()))
                 if (cmd=='!printer') or (cmd=='!tulostin'):
-                        ping_response = subprocess.Popen(["/bin/ping", "-c1", "-w2", "8.8.8.8"], stdout=subprocess.PIPE).stdout.read()
+                        ping_response = subprocess.Popen(["/bin/ping", "-c1", "-w2", printer_ip], stdout=subprocess.PIPE).stdout.read()
                         if ('rtt' in ping_response):
                           self.say('printer is online')
                         else:
