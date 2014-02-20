@@ -20,8 +20,6 @@ from rpi_camera import RPiCamera
 
 import subprocess
 
-#from subprocess import Popen
-
 
 # TODO: 
 # - Proper configuration
@@ -190,7 +188,6 @@ class PajaBot(SingleServerIRCBot):
                         else:
                           self.say('printer is offline')
                         print('p: ' + str(ping_response))
-#                        self.say('p: ' + str(ping_response))
 
 
 
