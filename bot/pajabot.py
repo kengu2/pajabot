@@ -94,8 +94,8 @@ class PajaBot(SingleServerIRCBot):
                         except UnicodeDecodeError:
                             print 'Somebody said something in non-utf8'
 #                                traceback.print_exc(file=sys.stdout)
-            except irc.client.ServerNotConnectedError:
-                print 'Not connected. Cant do anything atm.'
+                        except irc.client.ServerNotConnectedError:
+                            print 'Not connected. Cant do anything atm.'
                         time.sleep(0.5)
 
 
