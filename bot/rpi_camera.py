@@ -4,43 +4,43 @@ import os
 from PIL import Image,ImageStat
 
 class RPiCamera():
-        def __init__(self):
-		pass
+    def __init__(self):
+        pass
 
-	def takeShotCommand(self):
-		self.takeShot()
-		self.uploadShot()
-		self.removeShot()
+    def takeShotCommand(self):
+        self.takeShot()
+        self.uploadShot()
+        self.removeShot()
 
-	def checkLights(self):
-		self.takeShot()
-		pixelsum = self.getPixelSum()
-#		print "checkLights: pixelsum is " + str(pixelsum)
-		self.removeShot()
-		return pixelsum > 50
+    def checkLights(self):
+        self.takeShot()
+        pixelsum = self.getPixelSum()
+#        print "checkLights: pixelsum is " + str(pixelsum)
+        self.removeShot()
+        return pixelsum > 50
 
-	def takeShot(self):
-                os.system('/home/pi/pajabot/scripts/takeshot.sh')
+    def takeShot(self):
+        os.system('/home/pi/pajabot/scripts/takeshot.sh')
 
-	def removeShot(self):
-                os.system('/home/pi/pajabot/scripts/removeshot.sh')
+    def removeShot(self):
+        os.system('/home/pi/pajabot/scripts/removeshot.sh')
 
-	def uploadShot(self):
-                os.system('/home/pi/pajabot/scripts/uploadshot.sh')
+    def uploadShot(self):
+        os.system('/home/pi/pajabot/scripts/uploadshot.sh')
 
-	def getPixelSum(self):
-                im = Image.open("/tmp/shot.jpg")
-                stat = ImageStat.Stat(im)
-                pixelsum = stat.mean[0]+stat.mean[1]+stat.mean[2] 
-                return pixelsum
+    def getPixelSum(self):
+        im = Image.open("/tmp/shot.jpg")
+        stat = ImageStat.Stat(im)
+        pixelsum = stat.mean[0]+stat.mean[1]+stat.mean[2] 
+        return pixelsum
 
-	def checkSum(self):
-		self.takeShot()
-		im = Image.open("/tmp/shot.jpg")
-		stat = ImageStat.Stat(im)
-		pixelsum = stat.mean[0]+stat.mean[1]+stat.mean[2] 
-		pixelvar = stat.var[0]+stat.var[1]+stat.var[2]
-		self.uploadShot()
-		self.removeShot()
-		return pixelvar
+    def checkSum(self):
+        self.takeShot()
+        im = Image.open("/tmp/shot.jpg")
+        stat = ImageStat.Stat(im)
+        pixelsum = stat.mean[0]+stat.mean[1]+stat.mean[2] 
+        pixelvar = stat.var[0]+stat.var[1]+stat.var[2]
+        self.uploadShot()
+        self.removeShot()
+        return pixelvar
 
