@@ -95,7 +95,7 @@ class PajaBot(SingleServerIRCBot):
                 print 'Somebody said something in non-utf8'
 #                                traceback.print_exc(file=sys.stdout)
             except irc.client.ServerNotConnectedError:
-                print 'Not connected. Cant do anything atm.'
+                print 'Not connected. Can not do anything atm.'
             time.sleep(0.5)
 
 
@@ -168,6 +168,8 @@ class PajaBot(SingleServerIRCBot):
     def on_nicknameinuse(self, c, e):
         c.nick(c.get_nickname() + "_")
 
+    def on_disconnect(self, c, e):
+        raise SystemExit() 
 
     def on_pubmsg(self, c, e):
         cmd = e.arguments[0]
