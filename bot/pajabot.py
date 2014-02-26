@@ -73,30 +73,30 @@ print "-- end config --"
 
 class PajaBot(SingleServerIRCBot):
     def __init__(self):
-            spec = ServerSpec(server)
-            SingleServerIRCBot.__init__(self, [spec], nick, realname)
-            self.running = True
-            self.channel = ircchannel
-            self.doorStatus = None
-            self.camera = RPiCamera()
-            self.lightStatus = self.camera.checkLights()
-            self._connect()
-            self.lightCheck = 0 # Check only every N loops
-            self.statusMessage = "Hello world"
-            self.timestamp = datetime.datetime.now()
-            self.updateStatus()
+        spec = ServerSpec(server)
+        SingleServerIRCBot.__init__(self, [spec], nick, realname)
+        self.running = True
+        self.channel = ircchannel
+        self.doorStatus = None
+        self.camera = RPiCamera()
+        self.lightStatus = self.camera.checkLights()
+        self._connect()
+        self.lightCheck = 0 # Check only every N loops
+        self.statusMessage = "Hello world"
+        self.timestamp = datetime.datetime.now()
+        self.updateStatus()
 
-            while(self.running):
-                    self.checkLights()
-                    if (vaasa): self.read_feed()
-                    try:
-                            self.ircobj.process_once(0.2)
-                    except UnicodeDecodeError:
-                        print 'Somebody said something in non-utf8'
+        while(self.running):
+            self.checkLights()
+            if (vaasa): self.read_feed()
+            try:
+                self.ircobj.process_once(0.2)
+            except UnicodeDecodeError:
+                print 'Somebody said something in non-utf8'
 #                                traceback.print_exc(file=sys.stdout)
-                    except irc.client.ServerNotConnectedError:
-                        print 'Not connected. Cant do anything atm.'
-                    time.sleep(0.5)
+            except irc.client.ServerNotConnectedError:
+                print 'Not connected. Cant do anything atm.'
+            time.sleep(0.5)
 
 
     def read_feed(self):
@@ -149,64 +149,64 @@ class PajaBot(SingleServerIRCBot):
         os.system('/home/pi/pajabot/scripts/updatestatus.sh ' + openstatus + ' "' + self.statusMessage + '"')
         self.camera.takeShotCommand()
 
-        def on_welcome(self, c, e):
-                c.join(self.channel)
-                if (password!=''): c.privmsg("nickserv", "IDENTIFY " + password)
+    def on_welcome(self, c, e):
+        c.join(self.channel)
+        if (password!=''): c.privmsg("nickserv", "IDENTIFY " + password)
 
 
-        def sayDoorStatus(self):
-                c = self.connection
-                ds = self.doorStatus
-                dss = 'broken'
-                if ds is False:
-                    dss = 'open'
-                if ds is True:
-                    dss = 'closed'
-                dss = 'door is ' + dss
-                self.say(dss)
+    def sayDoorStatus(self):
+        c = self.connection
+        ds = self.doorStatus
+        dss = 'broken'
+        if ds is False:
+            dss = 'open'
+        if ds is True:
+            dss = 'closed'
+        dss = 'door is ' + dss
+        self.say(dss)
 
-        def on_nicknameinuse(self, c, e):
-            c.nick(c.get_nickname() + "_")
+    def on_nicknameinuse(self, c, e):
+        c.nick(c.get_nickname() + "_")
 
 
-        def on_pubmsg(self, c, e):
-                cmd = e.arguments[0]
-                if cmd=='!kuole':
-                        self.running = False
-                        SingleServerIRCBot.die(self, 'By your command')
-                if (cmd=='!ovi') or (cmd=='!door'):
-                        self.sayDoorStatus()
-                if (cmd=='!valot') or (cmd=='!lights'):
-                        self.say('lights are ' + ('on' if self.lightStatus else 'off'))
-                if (cmd=='!checksum') or (cmd=='!checksum'):
-                        self.say('pixelvar: ' + str(self.camera.checkSum()))
-                if (cmd=='!printer') or (cmd=='!tulostin'):
-                        ping_response = subprocess.Popen(["/bin/ping", "-c1", "-w2", printer_ip], stdout=subprocess.PIPE).stdout.read()
-                        if ('rtt' in ping_response):
-                          self.say('printer is online')
-                        else:
-                          self.say('printer is offline')
-                        print('p: ' + str(ping_response))
+    def on_pubmsg(self, c, e):
+        cmd = e.arguments[0]
+        if cmd=='!kuole':
+            self.running = False
+            SingleServerIRCBot.die(self, 'By your command')
+        if (cmd=='!ovi') or (cmd=='!door'):
+            self.sayDoorStatus()
+        if (cmd=='!valot') or (cmd=='!lights'):
+            self.say('lights are ' + ('on' if self.lightStatus else 'off'))
+        if (cmd=='!checksum') or (cmd=='!checksum'):
+            self.say('pixelvar: ' + str(self.camera.checkSum()))
+        if (cmd=='!printer') or (cmd=='!tulostin'):
+            ping_response = subprocess.Popen(["/bin/ping", "-c1", "-w2", printer_ip], stdout=subprocess.PIPE).stdout.read()
+            if ('rtt' in ping_response):
+                self.say('printer is online')
+            else:
+                self.say('printer is offline')
+            print('p: ' + str(ping_response))
 
-                if cmd=='!shot':
-                    self.camera.takeShotCommand()
-                    c.privmsg(self.channel, shoturl + ('' if self.lightStatus else ' (pretty dark, eh)'))
-                if cmd=='!gitpull':
-                    os.system('/home/pi/pajabot/scripts/gitpull.sh')
-                    c.privmsg(self.channel, 'Pulled from git, restarting..')
-                    self.restart_program()
-                if cmd=='!update':
-                    self.updateStatus()
-                    c.privmsg(self.channel, 'Done')
+        if cmd=='!shot':
+            self.camera.takeShotCommand()
+            c.privmsg(self.channel, shoturl + ('' if self.lightStatus else ' (pretty dark, eh)'))
+        if cmd=='!gitpull':
+            os.system('/home/pi/pajabot/scripts/gitpull.sh')
+            c.privmsg(self.channel, 'Pulled from git, restarting..')
+            self.restart_program()
+        if cmd=='!update':
+            self.updateStatus()
+            c.privmsg(self.channel, 'Done')
 
-        def _dispatcher(self, c, e):
-                eventtype = e.type
-                source = e.source
-                if source is not None:
-                        source = str(source)
-                else:
-                        source = ''
-                SingleServerIRCBot._dispatcher(self, c, e)
+    def _dispatcher(self, c, e):
+        eventtype = e.type
+        source = e.source
+        if source is not None:
+            source = str(source)
+        else:
+            source = ''
+        SingleServerIRCBot._dispatcher(self, c, e)
 
     def restart_program(self):
 
