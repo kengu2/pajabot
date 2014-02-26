@@ -72,31 +72,31 @@ print printer_ip
 print "-- end config --"
 
 class PajaBot(SingleServerIRCBot):
-        def __init__(self):
-                spec = ServerSpec(server)
-                SingleServerIRCBot.__init__(self, [spec], nick, realname)
-                self.running = True
-                self.channel = ircchannel
-                self.doorStatus = None
-                self.camera = RPiCamera()
-                self.lightStatus = self.camera.checkLights()
-                self._connect()
-                self.lightCheck = 0 # Check only every N loops
-                self.statusMessage = "Hello world"
-                self.timestamp = datetime.datetime.now()
-                self.updateStatus()
+    def __init__(self):
+            spec = ServerSpec(server)
+            SingleServerIRCBot.__init__(self, [spec], nick, realname)
+            self.running = True
+            self.channel = ircchannel
+            self.doorStatus = None
+            self.camera = RPiCamera()
+            self.lightStatus = self.camera.checkLights()
+            self._connect()
+            self.lightCheck = 0 # Check only every N loops
+            self.statusMessage = "Hello world"
+            self.timestamp = datetime.datetime.now()
+            self.updateStatus()
 
-                while(self.running):
-                        self.checkLights()
-                        if (vaasa): self.read_feed()
-                        try:
-                                self.ircobj.process_once(0.2)
-                        except UnicodeDecodeError:
-                            print 'Somebody said something in non-utf8'
+            while(self.running):
+                    self.checkLights()
+                    if (vaasa): self.read_feed()
+                    try:
+                            self.ircobj.process_once(0.2)
+                    except UnicodeDecodeError:
+                        print 'Somebody said something in non-utf8'
 #                                traceback.print_exc(file=sys.stdout)
-                        except irc.client.ServerNotConnectedError:
-                            print 'Not connected. Cant do anything atm.'
-                        time.sleep(0.5)
+                    except irc.client.ServerNotConnectedError:
+                        print 'Not connected. Cant do anything atm.'
+                    time.sleep(0.5)
 
 
     def read_feed(self):
@@ -158,10 +158,10 @@ class PajaBot(SingleServerIRCBot):
                 c = self.connection
                 ds = self.doorStatus
                 dss = 'broken'
-        if ds is False:
-                        dss = 'open'
+                if ds is False:
+                    dss = 'open'
                 if ds is True:
-                        dss = 'closed'
+                    dss = 'closed'
                 dss = 'door is ' + dss
                 self.say(dss)
 
@@ -188,17 +188,15 @@ class PajaBot(SingleServerIRCBot):
                           self.say('printer is offline')
                         print('p: ' + str(ping_response))
 
-
-
                 if cmd=='!shot':
-            self.camera.takeShotCommand()
+                    self.camera.takeShotCommand()
                     c.privmsg(self.channel, shoturl + ('' if self.lightStatus else ' (pretty dark, eh)'))
-        if cmd=='!gitpull':
+                if cmd=='!gitpull':
                     os.system('/home/pi/pajabot/scripts/gitpull.sh')
                     c.privmsg(self.channel, 'Pulled from git, restarting..')
-            self.restart_program()
+                    self.restart_program()
                 if cmd=='!update':
-                     self.updateStatus()
+                    self.updateStatus()
                     c.privmsg(self.channel, 'Done')
 
         def _dispatcher(self, c, e):
