@@ -127,7 +127,7 @@ class PajaBot(SingleServerIRCBot):
         c = self.connection
         global rss_timestamp
 
-        rssfeed = feedparser.parse(rss_url)
+        rssfeed = feedparser.parse(self.rss_url)
         if len(rssfeed.entries)>0:
             latest = rssfeed.entries[len(rssfeed.entries)-1]
             
