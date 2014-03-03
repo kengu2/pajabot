@@ -160,7 +160,7 @@ class PajaBot(SingleServerIRCBot):
             self.lightCheck = 120
 
     def say(self, text):
-        if messageasaction:
+        if self.messageasaction:
             self.connection.action(self.channel, text)
         else:
             self.connection.privmsg(self.channel, text)
