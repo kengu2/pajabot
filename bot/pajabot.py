@@ -12,6 +12,8 @@ import traceback
 import os
 import ConfigParser
 import feedparser
+import glob
+import imp
 
 from irc.bot import ServerSpec
 from irc.bot import SingleServerIRCBot
@@ -71,10 +73,28 @@ print password
 print printer_ip
 print "-- end config --"
 
+commands = {}
+
+def scan():
+    commands.clear()
+    for moduleSource in glob.glob ('plugins/*.py'):
+        name = moduleSource.replace ('.py','').replace ('\\','/').split ('/')[1].upper()
+        handle = open (moduleSource)
+        module = imp.load_module ('COMMAND_'+name, handle, ('plugins/'+moduleSource), ('.py', 'r', imp.PY_SOURCE))
+        commands[name] = module
+scan()
+
+print commands
+print commands.items()
+print commands['PRINTTERI'].info()
+commands['PRINTTERI'].info()
+
+
 class PajaBot(SingleServerIRCBot):
     def __init__(self):
         spec = ServerSpec(server)
         SingleServerIRCBot.__init__(self, [spec], nick, realname)
+        self.reconnection_interval = 60
         self.running = True
         self.channel = ircchannel
         self.doorStatus = None
@@ -189,6 +209,10 @@ class PajaBot(SingleServerIRCBot):
             else:
                 self.say('printer is offline')
             print('p: ' + str(ping_response))
+
+        if (cmd=='!printteri'):
+            commands['PRINTTERI'].index(c,e)
+
 
         if cmd=='!shot':
             self.camera.takeShotCommand()
