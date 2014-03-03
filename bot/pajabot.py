@@ -58,41 +58,41 @@ class PajaBot(SingleServerIRCBot):
 
         config.read(configfile)
 
-        server = config.get("bot","server")
-        ircchannel = config.get("bot","channel")
-        nick = config.get("bot","nick")
-        realname = config.get("bot","realname")
-        shoturl = config.get("bot","shoturl")
+        self.server = config.get("bot","server")
+        self.ircchannel = config.get("bot","channel")
+        self.nick = config.get("bot","nick")
+        self.realname = config.get("bot","realname")
+        self.shoturl = config.get("bot","shoturl")
 
-        messageasaction = config.getboolean("bot","messageasaction")
-        vaasa = config.getboolean("bot","vaasa")
-        printer_ip = config.get("bot","printer")
+        self.messageasaction = config.getboolean("bot","messageasaction")
+        self.vaasa = config.getboolean("bot","vaasa")
+        self.printer_ip = config.get("bot","printer")
 
 
         try:
-            password = config.get("bot","password")
+            self.password = config.get("bot","password")
         except ConfigParser.NoOptionError:
             print "no password"
-            password = ''
+            self.password = ''
 
         try:
-            rss_url = config.get("vaasa","rss")
+            self.rss_url = config.get("vaasa","rss")
         except ConfigParser.NoOptionError:
             print "not in vaasa?"
-            rss_url = ''
+            self.rss_url = ''
 
-        rss_timestamp = ''
+        self.rss_timestamp = ''
 
         print "-- config --"
-        print server
-        print ircchannel
-        print nick
-        print realname
-        print messageasaction
-        print vaasa
-        print rss_url
-        print password
-        print printer_ip
+        print self.server
+        print self.ircchannel
+        print self.nick
+        print self.realname
+        print self.messageasaction
+        print self.vaasa
+        print self.rss_url
+        print self.password
+        print self.printer_ip
         print "-- end config --"
 
 
@@ -127,7 +127,7 @@ class PajaBot(SingleServerIRCBot):
         c = self.connection
         global rss_timestamp
 
-        rssfeed = feedparser.parse(self.rss_url)
+        rssfeed = feedparser.parse(rss_url)
         if len(rssfeed.entries)>0:
             latest = rssfeed.entries[len(rssfeed.entries)-1]
             
