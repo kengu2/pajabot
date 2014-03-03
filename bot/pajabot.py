@@ -28,50 +28,6 @@ import subprocess
 # - Separate GPIO to different process
 # - Epic stuff
 
-config = ConfigParser.ConfigParser()
-
-configfile = '/home/pi/pajabot/bot.conf' 
-if (os.path.isfile('/home/pi/pajabot/local.conf')):
-    configfile = '/home/pi/pajabot/local.conf'
-
-config.read(configfile)
-
-server = config.get("bot","server")
-ircchannel = config.get("bot","channel")
-nick = config.get("bot","nick")
-realname = config.get("bot","realname")
-shoturl = config.get("bot","shoturl")
-
-messageasaction = config.getboolean("bot","messageasaction")
-vaasa = config.getboolean("bot","vaasa")
-printer_ip = config.get("bot","printer")
-
-
-try:
-    password = config.get("bot","password")
-except ConfigParser.NoOptionError:
-    print "no password"
-    password = ''
-
-try:
-    rss_url = config.get("vaasa","rss")
-except ConfigParser.NoOptionError:
-    print "not in vaasa?"
-    rss_url = ''
-
-rss_timestamp = ''
-
-print "-- config --"
-print server
-print ircchannel
-print nick
-print realname
-print messageasaction
-print vaasa
-print rss_url
-print password
-print printer_ip
-print "-- end config --"
 
 commands = {}
 
@@ -92,6 +48,54 @@ commands['PRINTTERI'].info()
 
 class PajaBot(SingleServerIRCBot):
     def __init__(self):
+
+
+        config = ConfigParser.ConfigParser()
+
+        configfile = '/home/pi/pajabot/bot.conf' 
+        if (os.path.isfile('/home/pi/pajabot/local.conf')):
+            configfile = '/home/pi/pajabot/local.conf'
+
+        config.read(configfile)
+
+        server = config.get("bot","server")
+        ircchannel = config.get("bot","channel")
+        nick = config.get("bot","nick")
+        realname = config.get("bot","realname")
+        shoturl = config.get("bot","shoturl")
+
+        messageasaction = config.getboolean("bot","messageasaction")
+        vaasa = config.getboolean("bot","vaasa")
+        printer_ip = config.get("bot","printer")
+
+
+        try:
+            password = config.get("bot","password")
+        except ConfigParser.NoOptionError:
+            print "no password"
+            password = ''
+
+        try:
+            rss_url = config.get("vaasa","rss")
+        except ConfigParser.NoOptionError:
+            print "not in vaasa?"
+            rss_url = ''
+
+        rss_timestamp = ''
+
+        print "-- config --"
+        print server
+        print ircchannel
+        print nick
+        print realname
+        print messageasaction
+        print vaasa
+        print rss_url
+        print password
+        print printer_ip
+        print "-- end config --"
+
+
         spec = ServerSpec(server)
         SingleServerIRCBot.__init__(self, [spec], nick, realname)
         self.reconnection_interval = 60
