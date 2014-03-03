@@ -1,3 +1,5 @@
+import subprocess
+
 def info():
     print "info"
 
