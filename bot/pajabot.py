@@ -220,7 +220,7 @@ class PajaBot(SingleServerIRCBot):
 
         if cmd=='!shot':
             self.camera.takeShotCommand()
-            c.privmsg(self.channel, shoturl + ('' if self.lightStatus else ' (pretty dark, eh)'))
+            c.privmsg(self.channel, self.shoturl + ('' if self.lightStatus else ' (pretty dark, eh)'))
         if cmd=='!gitpull':
             os.system('/home/pi/pajabot/scripts/gitpull.sh')
             c.privmsg(self.channel, 'Pulled from git, restarting..')
