@@ -175,7 +175,7 @@ class PajaBot(SingleServerIRCBot):
 
     def on_welcome(self, c, e):
         c.join(self.channel)
-        if (password!=''): c.privmsg("nickserv", "IDENTIFY " + password)
+        if (password!=''): c.privmsg("nickserv", "IDENTIFY " + self.password)
 
 
     def sayDoorStatus(self):
