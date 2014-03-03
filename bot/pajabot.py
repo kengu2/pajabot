@@ -207,7 +207,7 @@ class PajaBot(SingleServerIRCBot):
         if (cmd=='!checksum') or (cmd=='!checksum'):
             self.say('pixelvar: ' + str(self.camera.checkSum()))
         if (cmd=='!printer') or (cmd=='!tulostin'):
-            ping_response = subprocess.Popen(["/bin/ping", "-c1", "-w2", printer_ip], stdout=subprocess.PIPE).stdout.read()
+            ping_response = subprocess.Popen(["/bin/ping", "-c1", "-w2", self.printer_ip], stdout=subprocess.PIPE).stdout.read()
             if ('rtt' in ping_response):
                 self.say('printer is online')
             else:
