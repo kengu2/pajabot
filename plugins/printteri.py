@@ -3,7 +3,7 @@ import subprocess
 def info():
     print "info"
 
-def index (connection, event):
+def index (self, connection, event):
     ping_response = subprocess.Popen(["/bin/ping", "-c1", "-w2", self.printer_ip], stdout=subprocess.PIPE).stdout.read()
     if ('rtt' in ping_response):
         self.say('printer is online')

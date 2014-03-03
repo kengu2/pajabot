@@ -211,7 +211,7 @@ class PajaBot(SingleServerIRCBot):
             print('p: ' + str(ping_response))
 
         if (cmd=='!printteri'):
-            commands['PRINTTERI'].index(c,e)
+            commands['PRINTTERI'].index(self, c,e)
 
 
         if cmd=='!shot':
