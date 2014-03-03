@@ -131,10 +131,10 @@ class PajaBot(SingleServerIRCBot):
         if len(rssfeed.entries)>0:
             latest = rssfeed.entries[len(rssfeed.entries)-1]
             
-            if latest.id in rss_timestamp:
+            if latest.id in self.rss_timestamp:
                 variable = 2           
             else: 
-                rss_timestamp = latest.id
+                self.rss_timestamp = latest.id
                 try:
                     self.say("door opened by " + latest.title)
                     print "new openings " + latest.title
