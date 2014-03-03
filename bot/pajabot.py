@@ -96,8 +96,8 @@ class PajaBot(SingleServerIRCBot):
         print "-- end config --"
 
 
-        spec = ServerSpec(server)
-        SingleServerIRCBot.__init__(self, [spec], nick, realname)
+        spec = ServerSpec(self.server)
+        SingleServerIRCBot.__init__(self, [spec], self.nick, self.realname)
         self.reconnection_interval = 60
         self.running = True
         self.channel = ircchannel
