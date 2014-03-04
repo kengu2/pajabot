@@ -41,9 +41,6 @@ def scan():
 scan()
 
 print commands
-print commands.items()
-print commands['PRINTTERI'].info()
-commands['PRINTTERI'].info()
 
 
 class PajaBot(SingleServerIRCBot):
