@@ -49,7 +49,8 @@ commands['PRINTTERI'].info()
 class PajaBot(SingleServerIRCBot):
     def __init__(self):
 
-
+        scan()
+         
         config = ConfigParser.ConfigParser()
 
         configfile = '/home/pi/pajabot/bot.conf' 
