@@ -49,7 +49,6 @@ commands['PRINTTERI'].info()
 class PajaBot(SingleServerIRCBot):
     def __init__(self):
 
-        scan()
          
         config = ConfigParser.ConfigParser()
 
@@ -198,7 +197,7 @@ class PajaBot(SingleServerIRCBot):
 
     def on_pubmsg(self, c, e):
 #        cmd = e.arguments[0]
-        cmd = e.arguments()[0].split()[0]
+        cmd = e.arguments[0].split()[0]
 
         if cmd[0] == "!":
             cmd = cmd[1:].upper()
