@@ -196,7 +196,14 @@ class PajaBot(SingleServerIRCBot):
         raise SystemExit() 
 
     def on_pubmsg(self, c, e):
-        cmd = e.arguments[0]
+#        cmd = e.arguments[0]
+        cmd = e.arguments()[0].split()[0]
+
+        if cmd[0] == "!":
+            cmd = cmd[1:].upper()
+            if commands.has_key(cmd):
+                commands[cmd].index(self, c, e)
+
         if cmd=='!kuole':
             self.running = False
             SingleServerIRCBot.die(self, 'By your command')
