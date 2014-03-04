@@ -204,7 +204,7 @@ class PajaBot(SingleServerIRCBot):
             if commands.has_key(cmd):
                 commands[cmd].index(self, c, e)
             else:
-                cmd=''.join(cmd)
+                cmd=e.arguments[0]
 
         if cmd=='!kuole':
             self.running = False
