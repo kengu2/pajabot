@@ -193,7 +193,6 @@ class PajaBot(SingleServerIRCBot):
         raise SystemExit() 
 
     def on_pubmsg(self, c, e):
-#        cmd = e.arguments[0]
         cmd = e.arguments[0].split()[0]
 
         if cmd[0] == "!":
@@ -220,8 +219,8 @@ class PajaBot(SingleServerIRCBot):
                 self.say('printer is offline')
             print('p: ' + str(ping_response))
 
-        if (cmd=='!printteri'):
-            commands['PRINTTERI'].index(self, c,e)
+#        if (cmd=='!printteri'):
+#            commands['PRINTTERI'].index(self, c,e)
 
 
         if cmd=='!shot':
