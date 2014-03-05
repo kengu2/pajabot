@@ -1,6 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 import os
+import traceback
 from PIL import Image,ImageStat
 
 class RPiCamera():
