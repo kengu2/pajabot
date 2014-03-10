@@ -12,6 +12,8 @@ import traceback
 import os
 import ConfigParser
 import feedparser
+import glob
+import imp
 
 from irc.bot import ServerSpec
 from irc.bot import SingleServerIRCBot
@@ -26,57 +28,76 @@ import subprocess
 # - Separate GPIO to different process
 # - Epic stuff
 
-config = ConfigParser.ConfigParser()
 
-configfile = '/home/pi/pajabot/bot.conf' 
-if (os.path.isfile('/home/pi/pajabot/local.conf')):
-    configfile = '/home/pi/pajabot/local.conf'
+commands = {}
 
-config.read(configfile)
+def scan():
+    commands.clear()
+    for moduleSource in glob.glob ('plugins/*.py'):
+        name = moduleSource.replace ('.py','').replace ('\\','/').split ('/')[1].upper()
+        handle = open (moduleSource)
+        module = imp.load_module ('COMMAND_'+name, handle, ('plugins/'+moduleSource), ('.py', 'r', imp.PY_SOURCE))
+        commands[name] = module
+scan()
 
-server = config.get("bot","server")
-ircchannel = config.get("bot","channel")
-nick = config.get("bot","nick")
-realname = config.get("bot","realname")
-shoturl = config.get("bot","shoturl")
+print commands
 
-messageasaction = config.getboolean("bot","messageasaction")
-vaasa = config.getboolean("bot","vaasa")
-printer_ip = config.get("bot","printer")
-
-
-try:
-    password = config.get("bot","password")
-except ConfigParser.NoOptionError:
-    print "no password"
-    password = ''
-
-try:
-    rss_url = config.get("vaasa","rss")
-except ConfigParser.NoOptionError:
-    print "not in vaasa?"
-    rss_url = ''
-
-rss_timestamp = ''
-
-print "-- config --"
-print server
-print ircchannel
-print nick
-print realname
-print messageasaction
-print vaasa
-print rss_url
-print password
-print printer_ip
-print "-- end config --"
 
 class PajaBot(SingleServerIRCBot):
     def __init__(self):
-        spec = ServerSpec(server)
-        SingleServerIRCBot.__init__(self, [spec], nick, realname)
+
+         
+        config = ConfigParser.ConfigParser()
+
+        configfile = '/home/pi/pajabot/bot.conf' 
+        if (os.path.isfile('/home/pi/pajabot/local.conf')):
+            configfile = '/home/pi/pajabot/local.conf'
+
+        config.read(configfile)
+
+        self.server = config.get("bot","server")
+        self.ircchannel = config.get("bot","channel")
+        self.nick = config.get("bot","nick")
+        self.realname = config.get("bot","realname")
+        self.shoturl = config.get("bot","shoturl")
+
+        self.messageasaction = config.getboolean("bot","messageasaction")
+        self.vaasa = config.getboolean("bot","vaasa")
+        self.printer_ip = config.get("bot","printer")
+
+
+        try:
+            self.password = config.get("bot","password")
+        except ConfigParser.NoOptionError:
+            print "no password"
+            self.password = ''
+
+        try:
+            self.rss_url = config.get("vaasa","rss")
+        except ConfigParser.NoOptionError:
+            print "not in vaasa?"
+            self.rss_url = ''
+
+        self.rss_timestamp = ''
+
+        print "-- config --"
+        print self.server
+        print self.ircchannel
+        print self.nick
+        print self.realname
+        print self.messageasaction
+        print self.vaasa
+        print self.rss_url
+        print self.password
+        print self.printer_ip
+        print "-- end config --"
+
+
+        spec = ServerSpec(self.server)
+        SingleServerIRCBot.__init__(self, [spec], self.nick, self.realname)
+        self.reconnection_interval = 60
         self.running = True
-        self.channel = ircchannel
+        self.channel = self.ircchannel
         self.doorStatus = None
         self.camera = RPiCamera()
         self.lightStatus = self.camera.checkLights()
@@ -88,14 +109,15 @@ class PajaBot(SingleServerIRCBot):
 
         while(self.running):
             self.checkLights()
-            if (vaasa): self.read_feed()
+            if (self.vaasa): self.read_feed()
             try:
                 self.ircobj.process_once(0.2)
             except UnicodeDecodeError:
-                print 'Somebody said something in non-utf8'
+                pass
+#                print 'Somebody said something in non-utf8'
 #                                traceback.print_exc(file=sys.stdout)
             except irc.client.ServerNotConnectedError:
-                print 'Not connected. Cant do anything atm.'
+                print 'Not connected. Can not do anything atm.'
             time.sleep(0.5)
 
 
@@ -103,14 +125,14 @@ class PajaBot(SingleServerIRCBot):
         c = self.connection
         global rss_timestamp
 
-        rssfeed = feedparser.parse(rss_url)
+        rssfeed = feedparser.parse(self.rss_url)
         if len(rssfeed.entries)>0:
             latest = rssfeed.entries[len(rssfeed.entries)-1]
             
-            if latest.id in rss_timestamp:
+            if latest.id in self.rss_timestamp:
                 variable = 2           
             else: 
-                rss_timestamp = latest.id
+                self.rss_timestamp = latest.id
                 try:
                     self.say("door opened by " + latest.title)
                     print "new openings " + latest.title
@@ -136,7 +158,7 @@ class PajaBot(SingleServerIRCBot):
             self.lightCheck = 120
 
     def say(self, text):
-        if messageasaction:
+        if self.messageasaction:
             self.connection.action(self.channel, text)
         else:
             self.connection.privmsg(self.channel, text)
@@ -151,7 +173,7 @@ class PajaBot(SingleServerIRCBot):
 
     def on_welcome(self, c, e):
         c.join(self.channel)
-        if (password!=''): c.privmsg("nickserv", "IDENTIFY " + password)
+        if (self.password!=''): c.privmsg("nickserv", "IDENTIFY " + self.password)
 
 
     def sayDoorStatus(self):
@@ -168,9 +190,19 @@ class PajaBot(SingleServerIRCBot):
     def on_nicknameinuse(self, c, e):
         c.nick(c.get_nickname() + "_")
 
+    def on_disconnect(self, c, e):
+        raise SystemExit() 
 
     def on_pubmsg(self, c, e):
-        cmd = e.arguments[0]
+        cmd = e.arguments[0].split()[0]
+
+        if cmd[0] == "!":
+            cmd = cmd[1:].upper()
+            if commands.has_key(cmd):
+                commands[cmd].index(self, c, e)
+            else:
+                cmd=e.arguments[0]
+
         if cmd=='!kuole':
             self.running = False
             SingleServerIRCBot.die(self, 'By your command')
@@ -181,16 +213,20 @@ class PajaBot(SingleServerIRCBot):
         if (cmd=='!checksum') or (cmd=='!checksum'):
             self.say('pixelvar: ' + str(self.camera.checkSum()))
         if (cmd=='!printer') or (cmd=='!tulostin'):
-            ping_response = subprocess.Popen(["/bin/ping", "-c1", "-w2", printer_ip], stdout=subprocess.PIPE).stdout.read()
+            ping_response = subprocess.Popen(["/bin/ping", "-c1", "-w2", self.printer_ip], stdout=subprocess.PIPE).stdout.read()
             if ('rtt' in ping_response):
                 self.say('printer is online')
             else:
                 self.say('printer is offline')
             print('p: ' + str(ping_response))
 
+#        if (cmd=='!printteri'):
+#            commands['PRINTTERI'].index(self, c,e)
+
+
         if cmd=='!shot':
             self.camera.takeShotCommand()
-            c.privmsg(self.channel, shoturl + ('' if self.lightStatus else ' (pretty dark, eh)'))
+            c.privmsg(self.channel, self.shoturl + ('' if self.lightStatus else ' (pretty dark, eh)'))
         if cmd=='!gitpull':
             os.system('/home/pi/pajabot/scripts/gitpull.sh')
             c.privmsg(self.channel, 'Pulled from git, restarting..')

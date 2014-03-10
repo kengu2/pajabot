@@ -1,6 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 import os
+import traceback
 from PIL import Image,ImageStat
 
 class RPiCamera():
@@ -29,10 +30,15 @@ class RPiCamera():
         os.system('/home/pi/pajabot/scripts/uploadshot.sh')
 
     def getPixelSum(self):
-        im = Image.open("/tmp/shot.jpg")
-        stat = ImageStat.Stat(im)
-        pixelsum = stat.mean[0]+stat.mean[1]+stat.mean[2] 
-        return pixelsum
+        try:
+            im = Image.open("/tmp/shot.jpg")
+            stat = ImageStat.Stat(im)
+            pixelsum = stat.mean[0]+stat.mean[1]+stat.mean[2] 
+            return pixelsum
+        except IOError:
+            print "cannot identify image file"
+            traceback.print_exc()
+            return -1
 
     def checkSum(self):
         self.takeShot()
