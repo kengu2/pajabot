@@ -100,7 +100,12 @@ class PajaBot(SingleServerIRCBot):
         self.channel = self.ircchannel
         self.doorStatus = None
         self.camera = RPiCamera()
-        self.lightStatus = self.camera.checkLights()
+        if (self.vaasa):
+            from iioo import IiOo
+            self.iioo = IiOo()
+            self.lightStatus = self.iioo.checkLights()
+        else:
+            self.lightStatus = self.camera.checkLights()
         self._connect()
         self.lightCheck = 0 # Check only every N loops
         self.statusMessage = "Hello world"
