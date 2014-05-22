@@ -105,7 +105,8 @@ class PajaBot(SingleServerIRCBot):
             self.iioo = IiOo()
             self.lightStatus = self.iioo.checkLights()
         else:
-            self.lightStatus = self.camera.checkLights()
+            self.iioo = RpiCamera()
+            self.lightStatus = self.iioo.checkLights()
         self._connect()
         self.lightCheck = 0 # Check only every N loops
         self.statusMessage = "Hello world"
@@ -156,7 +157,7 @@ class PajaBot(SingleServerIRCBot):
         self.lightCheck -= 1
         if self.lightCheck < 0:
 #            print 'Checking lights..'
-            newLights = self.camera.checkLights()
+            newLights = self.iioo.checkLights()
             if newLights is not self.lightStatus:
                 newTimestamp = datetime.datetime.now()
                 timeDelta = str(newTimestamp - self.timestamp).split('.')[0]
