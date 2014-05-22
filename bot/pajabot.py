@@ -106,10 +106,15 @@ class PajaBot(SingleServerIRCBot):
         self.statusMessage = "Hello world"
         self.timestamp = datetime.datetime.now()
         self.updateStatus()
+        feed_read_counter=0
+
 
         while(self.running):
             self.checkLights()
-            if (self.vaasa): self.read_feed()
+            feed_read_counter +=1
+            if (self.vaasa && feed_read_counter==1000): 
+                feed_read_counter = 0
+                self.read_feed()
             try:
                 self.ircobj.process_once(0.2)
             except UnicodeDecodeError:
