@@ -106,7 +106,7 @@ class PajaBot(SingleServerIRCBot):
         self.statusMessage = "Hello world"
         self.timestamp = datetime.datetime.now()
         self.updateStatus()
-        feed_read_counter=0
+        feed_read_counter=990
 
 
         while(self.running):
