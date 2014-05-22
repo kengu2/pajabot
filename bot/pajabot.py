@@ -112,7 +112,7 @@ class PajaBot(SingleServerIRCBot):
         while(self.running):
             self.checkLights()
             feed_read_counter +=1
-            if (self.vaasa && feed_read_counter==1000): 
+            if (self.vaasa and feed_read_counter==1000): 
                 feed_read_counter = 0
                 self.read_feed()
             try:
