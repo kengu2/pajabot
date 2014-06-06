@@ -111,13 +111,13 @@ class PajaBot(SingleServerIRCBot):
         self.statusMessage = "Hello world"
         self.timestamp = datetime.datetime.now()
         self.updateStatus()
-        feed_read_counter=999
+        feed_read_counter=99
 
 
         while(self.running):
             self.checkLights()
             feed_read_counter +=1
-            if (self.vaasa and feed_read_counter==1000): 
+            if (self.vaasa and feed_read_counter==100): 
                 feed_read_counter = 0
                 self.read_feed()
             try:
@@ -165,7 +165,7 @@ class PajaBot(SingleServerIRCBot):
                 self.lightStatus = newLights
                 self.timestamp = newTimestamp
                 self.updateStatus()
-            self.lightCheck = 120
+            self.lightCheck = 12
 
     def say(self, text):
         if self.messageasaction:
