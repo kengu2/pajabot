@@ -45,8 +45,6 @@ print commands
 
 class PajaBot(SingleServerIRCBot):
     def __init__(self):
-
-         
         config = ConfigParser.ConfigParser()
 
         configfile = '/home/pi/pajabot/bot.conf' 
@@ -92,18 +90,20 @@ class PajaBot(SingleServerIRCBot):
         print self.printer_ip
         print "-- end config --"
 
-
-        spec = ServerSpec(self.server)
-        SingleServerIRCBot.__init__(self, [spec], self.nick, self.realname)
         self.reconnection_interval = 60
         self.running = True
         self.channel = self.ircchannel
         self.doorStatus = None
         self.camera = RPiCamera()
         self.lightStatus = self.camera.checkLights()
+        self.statusMessage = "Hello world"
+
+         
+    def run(self):
+        spec = ServerSpec(self.server)
+        SingleServerIRCBot.__init__(self, [spec], self.nick, self.realname)
         self._connect()
         self.lightCheck = 0 # Check only every N loops
-        self.statusMessage = "Hello world"
         self.timestamp = datetime.datetime.now()
         self.updateStatus()
 
@@ -190,8 +190,8 @@ class PajaBot(SingleServerIRCBot):
     def on_nicknameinuse(self, c, e):
         c.nick(c.get_nickname() + "_")
 
-    def on_disconnect(self, c, e):
-        raise SystemExit() 
+#    def on_disconnect(self, c, e):
+#        raise SystemExit() 
 
     def on_pubmsg(self, c, e):
         cmd = e.arguments[0].split()[0]
@@ -245,7 +245,6 @@ class PajaBot(SingleServerIRCBot):
         SingleServerIRCBot._dispatcher(self, c, e)
 
     def restart_program(self):
-
         print ('Restarting')
         subprocess.Popen("/home/pi/pajabot/bot/pajabot.py", shell=False)
         SingleServerIRCBot.die(self, 'By your command')
@@ -253,4 +252,5 @@ class PajaBot(SingleServerIRCBot):
 
 
 bot = PajaBot()
+bot.run()
 
