@@ -106,9 +106,14 @@ class PajaBot(SingleServerIRCBot):
         else:
             self.iioo = RpiCamera()
         self.lightStatus = self.iioo.checkLights()
+        self.statusMessage = "Hello world"
+
+         
+    def run(self):
+        spec = ServerSpec(self.server)
+        SingleServerIRCBot.__init__(self, [spec], self.nick, self.realname)
         self._connect()
         self.lightCheck = 0 # Check only every N loops
-        self.statusMessage = "Hello world"
         self.timestamp = datetime.datetime.now()
         self.updateStatus()
         feed_read_counter=99
@@ -201,8 +206,8 @@ class PajaBot(SingleServerIRCBot):
     def on_nicknameinuse(self, c, e):
         c.nick(c.get_nickname() + "_")
 
-    def on_disconnect(self, c, e):
-        raise SystemExit() 
+#    def on_disconnect(self, c, e):
+#        raise SystemExit() 
 
     def on_pubmsg(self, c, e):
         cmd = e.arguments[0].split()[0]
@@ -264,4 +269,5 @@ class PajaBot(SingleServerIRCBot):
 
 
 bot = PajaBot()
+bot.run()
 
