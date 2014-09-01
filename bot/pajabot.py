@@ -19,6 +19,7 @@ from irc.bot import ServerSpec
 from irc.bot import SingleServerIRCBot
 
 from rpi_camera import RPiCamera
+from spaceapi import SpaceAPI
 
 import subprocess
 
@@ -94,6 +95,7 @@ class PajaBot(SingleServerIRCBot):
         self.running = True
         self.channel = self.ircchannel
         self.doorStatus = None
+	self.spaceapi = SpaceAPI(config.get("bot", "spaceapiurl"))
         self.camera = RPiCamera()
         self.lightStatus = self.camera.checkLights()
         self.statusMessage = "Hello world"
@@ -168,7 +170,8 @@ class PajaBot(SingleServerIRCBot):
         openstatus = ('true' if self.lightStatus else 'false')
         self.statusMessage = ('The lab is manned' if self.lightStatus else 'No one here atm')
         print 'Updating status: ' + openstatus + ', ' + self.statusMessage
-        os.system('/home/pi/pajabot/scripts/updatestatus.sh ' + openstatus + ' "' + self.statusMessage + '"')
+	self.spaceapi.updateStatus(openstatus, self.statusMessage)
+#        os.system('/home/pi/pajabot/scripts/updatestatus.sh ' + openstatus + ' "' + self.statusMessage + '"')
         self.camera.takeShotCommand()
 
     def on_welcome(self, c, e):
