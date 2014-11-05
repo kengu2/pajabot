@@ -100,7 +100,7 @@ class PajaBot(SingleServerIRCBot):
         self.running = True
         self.channel = self.ircchannel
         self.doorStatus = None
-	self.spaceapi = SpaceAPI(config.get("bot", "spaceapiurl"))
+        self.spaceapi = SpaceAPI(config.get("bot", "spaceapiurl"))
         self.camera = RPiCamera()
         if (self.vaasa):
             from iioo import IiOo
@@ -186,7 +186,7 @@ class PajaBot(SingleServerIRCBot):
         openstatus = ('true' if self.lightStatus else 'false')
         self.statusMessage = ('The lab is manned' if self.lightStatus else 'No one here atm')
         print 'Updating status: ' + openstatus + ', ' + self.statusMessage
-	self.spaceapi.updateStatus(openstatus, self.statusMessage)
+        self.spaceapi.updateStatus(openstatus, self.statusMessage)
 #        os.system('/home/pi/pajabot/scripts/updatestatus.sh ' + openstatus + ' "' + self.statusMessage + '"')
         self.camera.takeShotCommand()
 
