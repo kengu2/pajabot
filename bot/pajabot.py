@@ -198,7 +198,7 @@ class PajaBot(SingleServerIRCBot):
     def sayDoorStatus(self):
         c = self.connection
         ds = self.doorStatus
-        dss = 'broken'
+        dss = 'not giving status a.k.a. broken'
         if ds is False:
             dss = 'open'
         if ds is True:
