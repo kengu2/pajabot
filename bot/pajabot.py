@@ -14,6 +14,8 @@ import ConfigParser
 import feedparser
 import glob
 import imp
+import urllib2
+import json
 
 from irc.bot import ServerSpec
 from irc.bot import SingleServerIRCBot
@@ -206,6 +208,39 @@ class PajaBot(SingleServerIRCBot):
         dss = 'door is ' + dss
         self.say(dss)
 
+    def sayPrinterStatus(self):
+        """
+        Fetch and say 3D printer status using OctoPrint JSON API.
+        API documentation: http://docs.octoprint.org/en/master/api/job.html
+        """
+
+        try:
+            response = urllib2.urlopen('http://' + self.printer_ip + '/api/job')
+            json_text = response.read()
+            response.close()
+        except urllib2.URLError, e:
+            self.say("Printer status: API checking failed: %s" % e.reason)
+            return
+        except urllib2.HTTPError, e:
+            self.say("Printer status: API checking failed: %s" % e.reason)
+            return
+
+        try:
+            data = json.loads(json_text)
+        except ValueError, e:
+            self.say("Printer status: API response parsing failed: %s" % e.reason)
+            return
+
+        state = data['state']
+        filename = data['job']['file']['name']
+        completion_percent = data['progress']['completion']
+        print_time_left = data['progress']['printTimeLeft']
+
+        if state == 'Printing':
+            self.say("Printer status: %s, %s, %d%%, %d minutes left" % (state, filename, completion_percent, print_time_left / 60))
+        else:
+            self.say("Printer status: %s" % state)
+
     def on_nicknameinuse(self, c, e):
         c.nick(c.get_nickname() + "_")
 
@@ -232,12 +267,7 @@ class PajaBot(SingleServerIRCBot):
         if (cmd=='!checksum') or (cmd=='!checksum'):
             self.say('pixelvar: ' + str(self.camera.checkSum()))
         if (cmd=='!printer') or (cmd=='!tulostin'):
-            ping_response = subprocess.Popen(["/bin/ping", "-c1", "-w2", self.printer_ip], stdout=subprocess.PIPE).stdout.read()
-            if ('rtt' in ping_response):
-                self.say('printer is online')
-            else:
-                self.say('printer is offline')
-            print('p: ' + str(ping_response))
+            self.sayPrinterStatus()
 
 #        if (cmd=='!printteri'):
 #            commands['PRINTTERI'].index(self, c,e)
