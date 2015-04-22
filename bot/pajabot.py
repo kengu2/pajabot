@@ -219,7 +219,6 @@ class PajaBot(SingleServerIRCBot):
             json_text = response.read()
             response.close()
         except urllib2.URLError, e:
-            print e.reason
             self.say("Printer status: API checking failed: %s" % e.reason)
             return
         except urllib2.HTTPError, e:
