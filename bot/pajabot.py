@@ -208,7 +208,7 @@ class PajaBot(SingleServerIRCBot):
         dss = 'door is ' + dss
         self.say(dss)
 
-    def sayPrinterStatus():
+    def sayPrinterStatus(self):
         """
         Fetch and say 3D printer status using OctoPrint JSON API.
         API documentation: http://docs.octoprint.org/en/master/api/job.html
