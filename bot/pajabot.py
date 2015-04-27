@@ -76,6 +76,13 @@ class PajaBot(SingleServerIRCBot):
             self.password = ''
 
         try:
+            self.apikey = config.get("bot","apikey")
+        except ConfigParser.NoOptionError:
+            print "no apikey"
+            self.apikey = ''
+
+
+        try:
             self.rss_url = config.get("vaasa","rss")
         except ConfigParser.NoOptionError:
             print "not in vaasa?"
@@ -215,7 +222,9 @@ class PajaBot(SingleServerIRCBot):
         """
 
         try:
-            response = urllib2.urlopen('http://' + self.printer_ip + '/api/job')
+            req = urllib2.Request('http://' + self.printer_ip + '/api/job')
+            req.add_header('X-Api-Key', self.apikey)
+            response = urllib2.urlopen(req)
             json_text = response.read()
             response.close()
         except urllib2.URLError, e:
