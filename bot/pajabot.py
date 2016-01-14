@@ -286,7 +286,7 @@ class PajaBot(SingleServerIRCBot):
             self.camera.takeShotCommand()
             c.privmsg(self.channel, self.shoturl + ('' if self.lightStatus else ' (pretty dark, eh)'))
         if cmd=='!gitpull':
-            os.system('/home/pi/pajabot/scripts/gitpull.sh')
+            os.system('/home/ovi/pajabot/scripts/gitpull.sh')
             c.privmsg(self.channel, 'Pulled from git, restarting..')
             self.restart_program()
         if cmd=='!update':
@@ -305,7 +305,7 @@ class PajaBot(SingleServerIRCBot):
     def restart_program(self):
 
         print ('Restarting')
-        subprocess.Popen("/home/pi/pajabot/bot/pajabot.py", shell=False)
+        subprocess.Popen("/home/ovi/pajabot/bot/pajabot.py", shell=False)
         SingleServerIRCBot.die(self, 'By your command')
         exit("updating")
 
