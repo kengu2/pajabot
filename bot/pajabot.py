@@ -138,7 +138,7 @@ class PajaBot(SingleServerIRCBot):
                 self.read_feed()
                 self.updateStatus()
             try:
-                self.ircobj.process_once(0.2)
+                self.reactor.process_once(0.2)
             except UnicodeDecodeError:
                 pass
 #                print 'Somebody said something in non-utf8'
