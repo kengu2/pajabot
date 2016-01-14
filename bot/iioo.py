@@ -14,6 +14,6 @@ class IiOo():
         pass
 
     def checkLights(self):
-        with open('/sys/class/gpio/gpio15/value') as f:
+        with open('/sys/class/gpio/gpio4/value') as f:
             status = f.read(1)
         return not (bool(int(status)))
