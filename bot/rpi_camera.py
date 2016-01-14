@@ -21,13 +21,13 @@ class RPiCamera():
         return pixelsum > 10
 
     def takeShot(self):
-        os.system('/home/pi/pajabot/scripts/takeshot.sh')
+        os.system('/home/ovi/pajabot/scripts/takeshot.sh')
 
     def removeShot(self):
-        os.system('/home/pi/pajabot/scripts/removeshot.sh')
+        os.system('/home/ovi/pajabot/scripts/removeshot.sh')
 
     def uploadShot(self):
-        os.system('/home/pi/pajabot/scripts/uploadshot.sh')
+        os.system('/home/ovi/pajabot/scripts/uploadshot.sh')
 
     def getPixelSum(self):
         try:
