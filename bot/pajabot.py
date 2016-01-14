@@ -52,9 +52,9 @@ class PajaBot(SingleServerIRCBot):
          
         config = ConfigParser.ConfigParser()
 
-        configfile = '/home/pi/pajabot/bot.conf' 
-        if (os.path.isfile('/home/pi/pajabot/local.conf')):
-            configfile = '/home/pi/pajabot/local.conf'
+        configfile = '/home/ovi/pajabot/bot.conf' 
+        if (os.path.isfile('/home/ovi/pajabot/local.conf')):
+            configfile = '/home/ovi/pajabot/local.conf'
 
         config.read(configfile)
 
