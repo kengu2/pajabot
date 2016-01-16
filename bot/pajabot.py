@@ -111,11 +111,12 @@ class PajaBot(SingleServerIRCBot):
         self.doorStatus = None
         self.spaceapi = SpaceAPI(config.get("bot", "spaceapiurl"))
         self.camera = RPiCamera()
-        if (self.vaasa):
-            from iioo import IiOo
-            self.iioo = IiOo()
-        else:
-            self.iioo = RpiCamera()
+#        if (self.vaasa):
+#            from iioo import IiOo
+#            self.iioo = IiOo()
+#        else:
+#            self.iioo = RpiCamera()
+        self.iioo = RpiCamera()
         self.lightStatus = self.iioo.checkLights()
         self.statusMessage = "Hello world"
 
