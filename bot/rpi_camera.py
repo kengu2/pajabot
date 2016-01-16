@@ -3,6 +3,10 @@
 import os
 import traceback
 from PIL import Image,ImageStat
+import requests
+from StringIO import StringIO
+
+url = "http://tunkki1.lan/cam1/lastsnap.jpg"
 
 class RPiCamera():
     def __init__(self):
@@ -31,7 +35,9 @@ class RPiCamera():
 
     def getPixelSum(self):
         try:
-            im = Image.open("/tmp/shot.jpg")
+            response = requests.get(url)
+            im = Image.open(StringIO(response.content))
+            #im = Image.open("/tmp/shot.jpg")
             stat = ImageStat.Stat(im)
             pixelsum = stat.mean[0]+stat.mean[1]+stat.mean[2] 
             return pixelsum
@@ -42,7 +48,9 @@ class RPiCamera():
 
     def checkSum(self):
         self.takeShot()
-        im = Image.open("/tmp/shot.jpg")
+        response = requests.get(url)
+        im = Image.open(StringIO(response.content))
+#        im = Image.open("/tmp/shot.jpg")
         stat = ImageStat.Stat(im)
         pixelsum = stat.mean[0]+stat.mean[1]+stat.mean[2] 
         pixelvar = stat.var[0]+stat.var[1]+stat.var[2]
