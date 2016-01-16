@@ -116,9 +116,8 @@ class PajaBot(SingleServerIRCBot):
 #            self.iioo = IiOo()
 #        else:
 #            self.iioo = RpiCamera()
-#        self.iioo = RpiCamera()
-#        self.lightStatus = self.iioo.checkLights()
-        self.lightStatus = self.camera.checkLights()
+        self.iioo = RPiCamera()
+        self.lightStatus = self.iioo.checkLights()
         self.statusMessage = "Hello world"
 
          
