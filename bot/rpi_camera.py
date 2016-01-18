@@ -22,7 +22,7 @@ class RPiCamera():
         pixelsum = self.getPixelSum()
 #        print "checkLights: pixelsum is " + str(pixelsum)
         self.removeShot()
-        return pixelsum > 500
+        return pixelsum > 600
 
     def takeShot(self):
         os.system('/home/ovi/pajabot/scripts/takeshot.sh')
