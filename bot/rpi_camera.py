@@ -37,7 +37,7 @@ class RPiCamera():
         try:
             response = requests.get(url)
             im = Image.open(StringIO(response.content))
-            im = im.crop((90,50,410,70))
+            im = im.crop((90,50,220,70))
             #im = Image.open("/tmp/shot.jpg")
             stat = ImageStat.Stat(im)
             pixelsum = stat.mean[0]+stat.mean[1]+stat.mean[2] 
