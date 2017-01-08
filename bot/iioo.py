@@ -3,8 +3,11 @@
 #import wiringpi2
 import time
 import sys
+import urllib2
 
 PIN=15
+
+LIGHT_CUT=700
 
 #wiringpi2.wiringPiSetupSys()
 #wiringpi2.pinMode(PIN,0)
@@ -14,6 +17,11 @@ class IiOo():
         pass
 
     def checkLights(self):
-        with open('/sys/class/gpio/gpio4/value') as f:
-            status = f.read(1)
-        return not (bool(int(status)))
+        
+        conn = urllib2.urlopen("https://api.thingspeak.com/channels/196110/fields/2/last")
+        response = conn.read()
+#    print "http status code=%s" % (conn.getcode())
+#    print response
+#    print LIGHT_CUT<response
+        conn.close()
+        return LIGHT_CUT<response
