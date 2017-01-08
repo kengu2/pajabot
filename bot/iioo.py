@@ -18,10 +18,13 @@ class IiOo():
 
     def checkLights(self):
         
-        conn = urllib2.urlopen("https://api.thingspeak.com/channels/196110/fields/2/last")
-        response = conn.read()
+        try:
+            conn = urllib2.urlopen("https://api.thingspeak.com/channels/196110/fields/2/last")
+            response = conn.read()
 #    print "http status code=%s" % (conn.getcode())
 #    print response
 #    print LIGHT_CUT<response
-        conn.close()
-        return LIGHT_CUT<int(response)
+            conn.close()
+            return LIGHT_CUT<int(response)
+        except:
+            pass
