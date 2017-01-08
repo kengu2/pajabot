@@ -24,4 +24,4 @@ class IiOo():
 #    print response
 #    print LIGHT_CUT<response
         conn.close()
-        return LIGHT_CUT<response
+        return LIGHT_CUT<int(response)
