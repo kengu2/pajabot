@@ -56,8 +56,9 @@ def on_subscribe(client, userdata, mid, granted_qos):
 
 def on_message(client, userdata, msg):
     print(msg.topic+" "+str(msg.qos)+" "+str(msg.payload))
-    mewmqttmessage = 1
+    mewmqttmessage = True
     mqttmessage = str(msg.payload)
+    print ("log " + mqttmessage)
 
 
 class PajaBot(SingleServerIRCBot):
