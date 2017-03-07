@@ -16,6 +16,8 @@ import glob
 import imp
 import urllib2
 import json
+import paho.mqtt.client as paho
+
 
 from irc.bot import ServerSpec
 from irc.bot import SingleServerIRCBot
@@ -34,6 +36,7 @@ import subprocess
 
 commands = {}
 
+
 def scan():
     commands.clear()
     for moduleSource in glob.glob ('plugins/*.py'):
@@ -48,14 +51,11 @@ print commands
 
 class PajaBot(SingleServerIRCBot):
     def __init__(self):
-
          
         config = ConfigParser.ConfigParser()
-
         configfile = '/home/ovi/pajabot/bot.conf' 
         if (os.path.isfile('/home/ovi/pajabot/local.conf')):
             configfile = '/home/ovi/pajabot/local.conf'
-
         config.read(configfile)
 
         self.server = config.get("bot","server")
@@ -120,7 +120,15 @@ class PajaBot(SingleServerIRCBot):
         self.lightStatus = self.iioo.checkLights()
         self.statusMessage = "Hello world"
 
-         
+
+    def on_subscribe(self, client, userdata, mid, granted_qos):
+        print("Subscribed: "+str(mid)+" "+str(granted_qos))
+
+    def on_message(self, client, userdata, msg):
+        print(msg.topic+" "+str(msg.qos)+" "+str(msg.payload))
+        self.mqtt_door(str(msg.payload))
+
+        
     def run(self):
         spec = ServerSpec(self.server)
         SingleServerIRCBot.__init__(self, [spec], self.nick, self.realname)
@@ -130,6 +138,17 @@ class PajaBot(SingleServerIRCBot):
         self.updateStatus()
         feed_read_counter=99
 
+
+        mqttclient = paho.Client()
+        mqttclient.on_subscribe = on_subscribe
+        mqttclient.on_message = on_message
+        try:
+            mqttclient.connect("tunkki9", 1883)
+        except:
+            print "mqtt not connected"
+
+        mqttclient.loop_start()
+        mqttclient.subscribe("door/#", qos=1)
 
         while(self.running):
             self.checkLights()
@@ -167,7 +186,15 @@ class PajaBot(SingleServerIRCBot):
                 except:
                     print "not connected"
 
+    def mqtt_door(self, name):
+        c = self.connection
+        try:
+            self.say("door opened by " + name)
+            print "new openings " + name
+        except:
+            print "not connected"
 
+                   
 
 
     def checkLights(self):
