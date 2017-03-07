@@ -144,7 +144,6 @@ class PajaBot(SingleServerIRCBot):
         self.updateStatus()
         feed_read_counter=99
 
-
         mqttclient = paho.Client()
         mqttclient.on_subscribe = on_subscribe
         mqttclient.on_message = on_message
@@ -196,8 +195,8 @@ class PajaBot(SingleServerIRCBot):
     def mqtt_door(self):
 	global newmqttmessage
 	global mqttmessage
-        print newmqttmessage
-        print mqttmessage
+#        print newmqttmessage
+#        print mqttmessage
         if newmqttmessage:
             newmqttmessage = False
             try:
