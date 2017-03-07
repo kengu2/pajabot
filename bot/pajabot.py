@@ -48,6 +48,17 @@ scan()
 
 print commands
 
+newmqttmessage = False
+mqttmessage = ""
+
+def on_subscribe(client, userdata, mid, granted_qos):
+    print("Subscribed: "+str(mid)+" "+str(granted_qos))
+
+def on_message(client, userdata, msg):
+    print(msg.topic+" "+str(msg.qos)+" "+str(msg.payload))
+    mewmqttmessage = 1
+    mqttmessage = str(msg.payload)
+
 
 class PajaBot(SingleServerIRCBot):
     def __init__(self):
@@ -121,12 +132,6 @@ class PajaBot(SingleServerIRCBot):
         self.statusMessage = "Hello world"
 
 
-    def on_subscribe(self, client, userdata, mid, granted_qos):
-        print("Subscribed: "+str(mid)+" "+str(granted_qos))
-
-    def on_message(self, client, userdata, msg):
-        print(msg.topic+" "+str(msg.qos)+" "+str(msg.payload))
-        self.mqtt_door(str(msg.payload))
 
         
     def run(self):
@@ -152,6 +157,7 @@ class PajaBot(SingleServerIRCBot):
 
         while(self.running):
             self.checkLights()
+            self.mqtt_door()
             feed_read_counter +=1
             if (self.vaasa and feed_read_counter==100): 
                 feed_read_counter = 0
@@ -186,17 +192,15 @@ class PajaBot(SingleServerIRCBot):
                 except:
                     print "not connected"
 
-    def mqtt_door(self, name):
-        c = self.connection
-        try:
-            self.say("door opened by " + name)
-            print "new openings " + name
-        except:
-            print "not connected"
-
-                   
-
-
+    def mqtt_door(self):
+        if newmqttmessage == True:
+            mqttmessage = False
+            try:
+                self.say("door opened by " + mqttmessage)
+                print "new openings " + mqttmessage
+            except:
+                print "not connected"
+                           
     def checkLights(self):
         self.lightCheck -= 1
         if self.lightCheck < 0:
