@@ -7,7 +7,7 @@ import urllib2
 
 PIN=15
 
-LIGHT_CUT=700
+LIGHT_CUT=950
 
 #wiringpi2.wiringPiSetupSys()
 #wiringpi2.pinMode(PIN,0)

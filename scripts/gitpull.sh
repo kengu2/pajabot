@@ -1,4 +1,4 @@
 #!/bin/sh
-cd /home/pi/pajabot
+cd /home/ovi/pajabot
 git pull
 

@@ -56,10 +56,10 @@ def on_subscribe(client, userdata, mid, granted_qos):
 
 def on_message(client, userdata, msg):
     print(msg.topic+" "+str(msg.qos)+" "+str(msg.payload))
+    global newmqttmessage 
     newmqttmessage = True
+    global mqttmessage
     mqttmessage = str(msg.payload)
-    print ("log " + mqttmessage)
-
 
 class PajaBot(SingleServerIRCBot):
     def __init__(self):
@@ -194,6 +194,10 @@ class PajaBot(SingleServerIRCBot):
                     print "not connected"
 
     def mqtt_door(self):
+	global newmqttmessage
+	global mqttmessage
+        print newmqttmessage
+        print mqttmessage
         if newmqttmessage:
             newmqttmessage = False
             try:
@@ -201,6 +205,7 @@ class PajaBot(SingleServerIRCBot):
                 print "new opening " + mqttmessage
             except:
                 print "not connected"
+            mqttmessage = ""
                            
     def checkLights(self):
         self.lightCheck -= 1
