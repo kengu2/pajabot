@@ -211,6 +211,8 @@ class PajaBot(SingleServerIRCBot):
         if self.lightCheck < 0:
 #            print 'Checking lights..'
             newLights = self.iioo.checkLights()
+            if (newLights is None):
+                newLights = self.lightStatus
             if newLights is not self.lightStatus:
                 self.say("status " + str(self.lightStatus))
                 self.say("newstatus " + str(newLights))
