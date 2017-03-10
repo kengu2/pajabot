@@ -214,8 +214,8 @@ class PajaBot(SingleServerIRCBot):
             if (newLights is None):
                 newLights = self.lightStatus
             if newLights is not self.lightStatus:
-                self.say("status " + str(self.lightStatus))
-                self.say("newstatus " + str(newLights))
+#                self.say("status " + str(self.lightStatus))
+#                self.say("newstatus " + str(newLights))
                 newTimestamp = datetime.datetime.now()
                 timeDelta = str(newTimestamp - self.timestamp).split('.')[0]
                 lss = 'lights ' + ('went off (lights were illuminated for ' if not newLights else 'on (darkness had fallen for ') + timeDelta + ')'
