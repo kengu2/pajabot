@@ -158,11 +158,11 @@ class PajaBot(SingleServerIRCBot):
         while(self.running):
             self.checkLights()
             self.mqtt_door()
-            feed_read_counter +=1
-            if (self.vaasa and feed_read_counter==100): 
-                feed_read_counter = 0
-                self.read_feed()
-                self.updateStatus()
+#            feed_read_counter +=1
+#            if (self.vaasa and feed_read_counter==100): 
+#                feed_read_counter = 0
+#                self.read_feed()
+#                self.updateStatus()
             try:
                 self.reactor.process_once(0.2)
             except UnicodeDecodeError:
